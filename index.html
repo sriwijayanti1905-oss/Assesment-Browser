@@ -1,0 +1,1687 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asesment Browser - Platform Ujian Online Proteksi Tinggi</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            200: '#ddd6fe',
+                            300: '#c4b5fd',
+                            400: '#a78bfa',
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                            700: '#6d28d9',
+                            800: '#5b21b6',
+                            900: '#4c1d95',
+                        },
+                        softgray: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            400: '#94a3b8'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Styles & Anti-Copy Guardrails */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #334155;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        /* Allow typing inside form inputs and textareas */
+        input, textarea, select {
+            -webkit-user-select: text !important;
+            -moz-user-select: text !important;
+            -ms-user-select: text !important;
+            user-select: text !important;
+        }
+
+        /* Protected Question Canvas Effect */
+        .protected-text {
+            position: relative;
+            background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+            background-size: 12px 12px;
+        }
+
+        .protected-text::after {
+            content: "SECURE ASSESSMENT SYSTEM • DO NOT COPY";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-15deg);
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: rgba(124, 58, 237, 0.05);
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        /* Pulse animation for timer warning */
+        @keyframes timerPulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+        .timer-warning {
+            animation: timerPulse 1s infinite;
+            color: #ef4444 !important;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c4b5fd;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #7c3aed;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-softgray-50 flex flex-col justify-between" oncontextmenu="return false;">
+
+    <!-- Top Navigation Bar -->
+    <header class="bg-white border-b border-softgray-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-brand-600 text-white flex items-center justify-center font-bold text-xl shadow-md">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg text-slate-800 tracking-tight leading-none">Asesment Browser</h1>
+                    <span class="text-xs text-brand-600 font-medium">Sistem Evaluasi Terproteksi</span>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-3">
+                <button id="teacherPanelNavBtn" onclick="toggleTeacherAuthModal()" class="px-3.5 py-1.5 rounded-lg border border-brand-200 text-brand-700 bg-brand-50 hover:bg-brand-100 font-medium text-sm transition-all flex items-center space-x-2">
+                    <i class="fa-solid fa-user-shield"></i>
+                    <span>Panel Guru</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER FOR VIEWS -->
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 py-6 flex-grow w-full">
+
+        <!-- VIEW 1: STUDENT IDENTITY FORM -->
+        <section id="identityView" class="block">
+            <div class="max-w-lg mx-auto bg-white rounded-2xl shadow-xl border border-softgray-200 overflow-hidden">
+                <div class="bg-gradient-to-r from-brand-700 to-brand-500 p-6 text-white text-center">
+                    <div class="inline-flex p-3 bg-white/10 rounded-full mb-3 backdrop-blur-sm">
+                        <i class="fa-solid fa-id-card text-2xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold">Identitas Siswa</h2>
+                    <p class="text-brand-100 text-sm mt-1">Silakan isi identitas Anda sebelum mulai mengerjakan asesmen.</p>
+                </div>
+
+                <form id="studentAuthForm" onsubmit="handleStartExam(event)" class="p-6 space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Nama Lengkap Siswa</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400"><i class="fa-solid fa-user"></i></span>
+                            <input type="text" id="studentName" required class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-softgray-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm transition-all" placeholder="Contoh: Ahmad Subagja">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Kelas</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400"><i class="fa-solid fa-school"></i></span>
+                                <select id="studentClass" required class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-softgray-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm transition-all bg-white">
+                                    <option value="">Pilih Kelas</option>
+                                    <option value="VIII 4">VIII 4</option>
+                                    <option value="VIII 3">VIII 3</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Tanggal Lahir</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400"><i class="fa-solid fa-calendar"></i></span>
+                                <input type="date" id="studentDob" required class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-softgray-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm transition-all">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">PIN Absensi Siswa (1 Kali Pakai)</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400"><i class="fa-solid fa-key"></i></span>
+                            <input type="text" id="studentPin" required maxlength="10" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-softgray-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm font-mono tracking-widest uppercase transition-all" placeholder="Masukkan PIN (cth: PIN01)">
+                        </div>
+                        <p class="text-xs text-slate-400 mt-1"><i class="fa-solid fa-circle-info mr-1"></i>PIN diberikan oleh guru sesuai nomor absensi Anda.</p>
+                    </div>
+
+                    <div id="authAlert" class="hidden p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center space-x-2">
+                        <i class="fa-solid fa-triangle-exclamation text-base flex-shrink-0"></i>
+                        <span id="authAlertMsg">Pesan Peringatan</span>
+                    </div>
+
+                    <button type="submit" class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl shadow-lg shadow-brand-200 transition-all flex items-center justify-center space-x-2">
+                        <span>Mulai Asesmen</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- VIEW 2: EXAM ASSESSMENT ENGINE -->
+        <section id="examView" class="hidden space-y-4">
+            <!-- Exam Progress Bar & Header -->
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-softgray-200 flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center space-x-3">
+                    <span id="questionCategoryBadge" class="px-3 py-1 bg-brand-100 text-brand-700 rounded-full text-xs font-bold uppercase tracking-wider">
+                        Pilihan Ganda
+                    </span>
+                    <span class="text-sm font-semibold text-slate-700">Soal <span id="currentQuestionNum" class="text-brand-600">1</span> dari <span id="totalQuestionsNum">25</span></span>
+                </div>
+
+                <!-- Timer Display -->
+                <div class="flex items-center space-x-2 bg-softgray-100 px-3 py-1.5 rounded-xl border border-softgray-200">
+                    <i class="fa-solid fa-clock text-brand-600" id="timerIcon"></i>
+                    <span id="timerDisplay" class="font-mono text-base font-bold text-slate-800">00:30</span>
+                </div>
+            </div>
+
+            <!-- Anti-Cheating Warning Banner -->
+            <div id="fraudWarningBanner" class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-amber-800 text-xs flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-shield-halved text-amber-600 text-base"></i>
+                    <span><strong>Mode Proteksi Aktif:</strong> Jangan berpindah tab atau meninggalkan jendela browser!</span>
+                </div>
+                <span class="bg-amber-200 px-2 py-0.5 rounded font-bold" id="fraudCountBadge">Peringatan: 0/2</span>
+            </div>
+
+            <!-- QUESTION & ANSWER SEPARATE TOGGLE BAR -->
+            <div class="flex items-center justify-between bg-white p-2 rounded-xl border border-softgray-200 shadow-sm">
+                <button id="toggleQuestionBtn" onclick="setQuestionViewMode('question')" class="flex-1 py-2 px-4 rounded-lg font-semibold text-xs sm:text-sm transition-all bg-brand-600 text-white flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-file-lines"></i>
+                    <span>Tampilkan Teks Soal</span>
+                </button>
+                <div class="w-2"></div>
+                <button id="toggleOptionsBtn" onclick="setQuestionViewMode('options')" class="flex-1 py-2 px-4 rounded-lg font-semibold text-xs sm:text-sm transition-all bg-softgray-100 text-slate-600 hover:bg-softgray-200 flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-list-check"></i>
+                    <span>Tampilkan Pilihan Opsi</span>
+                </button>
+            </div>
+
+            <!-- QUESTION TEXT BOX CONTAINER -->
+            <div id="questionContainer" class="bg-white rounded-2xl p-6 shadow-sm border border-softgray-200 protected-text">
+                <p id="questionText" class="text-base sm:text-lg font-medium text-slate-800 leading-relaxed select-none">
+                    Memuat teks soal...
+                </p>
+            </div>
+
+            <!-- OPTIONS CONTAINER -->
+            <div id="optionsContainer" class="bg-white rounded-2xl p-6 shadow-sm border border-softgray-200 hidden">
+                <h3 id="optionsTitle" class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Pilih Jawaban Anda:</h3>
+                
+                <!-- Dynamic Options List -->
+                <div id="optionsList" class="space-y-3">
+                    <!-- Populated dynamically via JavaScript -->
+                </div>
+
+                <!-- Essay Input Area -->
+                <div id="essayArea" class="hidden space-y-3">
+                    <textarea id="essayInput" rows="5" class="w-full p-4 rounded-xl border border-softgray-300 focus:ring-2 focus:ring-brand-500 text-slate-800 text-sm transition-all" placeholder="Tuliskan jawaban essay Anda secara lengkap dan lugas di sini..."></textarea>
+                    <p class="text-xs text-slate-400"><i class="fa-solid fa-circle-info mr-1"></i>Jawaban essay akan diperiksa dan dinilai langsung oleh Guru.</p>
+                </div>
+            </div>
+
+            <!-- ACTION CONTROLS (Hanya navigasi 1 arah, tanpa tombol Sebelumnya) -->
+            <div id="actionControlsContainer" class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+                <span id="autoAdvanceNotice" class="text-xs text-slate-500 font-medium flex items-center gap-1.5">
+                    <i class="fa-solid fa-shield-halved text-brand-600"></i>
+                    <span>Jawaban yang sudah dikirim atau terlewati tidak dapat diubah kembali.</span>
+                </span>
+
+                <button id="confirmNextBtn" onclick="submitAndNext()" class="w-full sm:w-auto px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl text-sm shadow-md shadow-brand-200 transition-all flex items-center justify-center space-x-2 hidden">
+                    <span id="confirmBtnText">Simpan & Lanjut</span>
+                    <i class="fa-solid fa-chevron-right text-xs"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- VIEW 3: EXAM RESULTS VIEW -->
+        <section id="resultsView" class="hidden max-w-2xl mx-auto space-y-6">
+            <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-xl border border-softgray-200 text-center space-y-6">
+                <div class="inline-flex p-4 rounded-full bg-brand-50 border border-brand-200 text-brand-600 text-4xl mb-2">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-800">Asesment Selesai!</h2>
+                    <p id="studentResultGreeting" class="text-sm text-slate-500 mt-1">Terima kasih telah mengerjakan asesmen dengan jujur.</p>
+                </div>
+
+                <!-- Score Box -->
+                <div class="bg-gradient-to-br from-brand-50 to-softgray-100 p-6 rounded-2xl border border-brand-100">
+                    <span class="text-xs uppercase font-bold text-slate-400 tracking-wider">Skor Total Pilihan Ganda & Objektif</span>
+                    <div id="scoreDisplay" class="text-5xl font-extrabold text-brand-700 my-2">0/100</div>
+                    <p id="essayPendingNotice" class="text-xs text-amber-700 bg-amber-50 p-2 rounded-lg border border-amber-200 mt-2">
+                        <i class="fa-solid fa-hourglass-half mr-1"></i>Catatan: Nilai akhir akhir akan ditambahkan setelah penilaian Essay oleh Guru.
+                    </p>
+                </div>
+
+                <!-- Encouragement Message -->
+                <div id="encouragementBox" class="p-4 rounded-xl bg-brand-50 text-brand-800 font-semibold text-base border border-brand-200">
+                    "Bagus sekali! Terus tingkatkan prestasimu!"
+                </div>
+
+                <!-- Meme Section -->
+                <div class="space-y-2">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Ekspresi Hasil Hasil Anda</span>
+                    <div class="w-full max-w-md mx-auto aspect-video rounded-xl overflow-hidden border border-softgray-300 shadow-sm bg-slate-900 flex items-center justify-center relative">
+                        <img id="resultMemeImg" src="" alt="Result Meme" class="w-full h-full object-contain" onerror="this.src='https://placehold.co/600x400/7c3aed/ffffff?text=Ujian+Selesai!';">
+                    </div>
+                </div>
+
+                <!-- Action Download PDF / Text -->
+                <div class="pt-4 flex flex-col sm:flex-row gap-3 justify-center">
+                    <button onclick="downloadReport()" class="w-full sm:w-auto px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl text-sm shadow-md transition-all flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-download"></i>
+                        <span>Download Laporan Hasil (PDF/Text)</span>
+                    </button>
+                    <button onclick="resetToIdentity()" class="w-full sm:w-auto px-6 py-3 bg-softgray-200 hover:bg-softgray-300 text-slate-700 font-semibold rounded-xl text-sm transition-all">
+                        <span>Kembali ke Halaman Awal</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 4: TEACHER PANEL -->
+        <section id="teacherPanel" class="hidden space-y-6">
+            <div class="bg-white rounded-2xl p-6 shadow-md border border-softgray-200 flex flex-wrap items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-chalkboard-user text-brand-600"></i>
+                        <span>Panel Kelola Guru</span>
+                    </h2>
+                    <p class="text-xs text-slate-500">Kelola soal, koreksi essay, pantau kecurangan, dan upload meme.</p>
+                </div>
+                <button onclick="exitTeacherPanel()" class="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl text-xs font-bold transition-all">
+                    <i class="fa-solid fa-right-from-bracket mr-1"></i> Keluar Panel
+                </button>
+            </div>
+
+            <!-- TEACHER TABS -->
+            <div class="flex border-b border-softgray-300 space-x-2 sm:space-x-6 overflow-x-auto pb-1">
+                <button id="tabBtnSubmissions" onclick="switchTeacherTab('submissions')" class="py-2.5 px-4 font-bold text-sm border-b-2 border-brand-600 text-brand-600 transition-all whitespace-nowrap">
+                    <i class="fa-solid fa-users mr-1.5"></i> Hasil Siswa & Penilaian Essay
+                </button>
+                <button id="tabBtnFraud" onclick="switchTeacherTab('fraud')" class="py-2.5 px-4 font-bold text-sm border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition-all whitespace-nowrap">
+                    <i class="fa-solid fa-user-slash mr-1.5"></i> Siswa Terdeteksi Kecurangan
+                </button>
+                <button id="tabBtnQuestions" onclick="switchTeacherTab('questions')" class="py-2.5 px-4 font-bold text-sm border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition-all whitespace-nowrap">
+                    <i class="fa-solid fa-database mr-1.5"></i> Kelola Soal & Kunci
+                </button>
+                <button id="tabBtnMemes" onclick="switchTeacherTab('memes')" class="py-2.5 px-4 font-bold text-sm border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition-all whitespace-nowrap">
+                    <i class="fa-solid fa-icons mr-1.5"></i> Upload / Kelola Meme
+                </button>
+            </div>
+
+            <!-- TAB 1: STUDENT SUBMISSIONS & ESSAY GRADING -->
+            <div id="tabSubmissions" class="space-y-4">
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-softgray-200 overflow-x-auto">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wider">Daftar Hasil Ujian Siswa</h3>
+                        <span class="text-xs text-slate-500" id="submissionCount">Total: 0 Siswa</span>
+                    </div>
+
+                    <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                        <thead>
+                            <tr class="bg-softgray-100 text-slate-600 border-b border-softgray-200">
+                                <th class="p-3">Nama Siswa</th>
+                                <th class="p-3">Kelas</th>
+                                <th class="p-3">PIN</th>
+                                <th class="p-3">Nilai PG</th>
+                                <th class="p-3">Nilai Essay</th>
+                                <th class="p-3">Nilai Akhir Total</th>
+                                <th class="p-3">Status Essay</th>
+                                <th class="p-3 text-center">Aksi (Koreksi/Review)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentSubmissionsTable" class="divide-y divide-softgray-200">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB 2: FRAUD LIST -->
+            <div id="tabFraud" class="hidden space-y-4">
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-softgray-200">
+                    <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wider mb-4 text-red-600 flex items-center gap-2">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <span>Daftar Akun / PIN Siswa Terkunci Permanen (Kecurangan)</span>
+                    </h3>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                            <thead>
+                                <tr class="bg-red-50 text-red-700 border-b border-red-200">
+                                    <th class="p-3">Nama Siswa</th>
+                                    <th class="p-3">Kelas</th>
+                                    <th class="p-3">PIN Terkunci</th>
+                                    <th class="p-3">Waktu Pelanggaran</th>
+                                    <th class="p-3">Alasan Lockout</th>
+                                    <th class="p-3">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="fraudTable" class="divide-y divide-softgray-200">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: QUESTION MANAGEMENT -->
+            <div id="tabQuestions" class="hidden space-y-4">
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-softgray-200 space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wider">Bank Soal Assessment (28 Soal)</h3>
+                        <button onclick="openQuestionModal(null)" class="px-3.5 py-2 bg-brand-600 text-white rounded-xl text-xs font-bold shadow-sm hover:bg-brand-700 transition-all">
+                            <i class="fa-solid fa-plus mr-1"></i> Tambah Soal Baru
+                        </button>
+                    </div>
+
+                    <div id="questionBankList" class="space-y-3">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: MEME MANAGEMENT -->
+            <div id="tabMemes" class="hidden space-y-4">
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-softgray-200 space-y-6">
+                    <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wider">Pengaturan Gallery Meme Penutup</h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Happy Memes Upload (High Score >= 70) -->
+                        <div class="p-4 bg-emerald-50 rounded-2xl border border-emerald-200 space-y-3">
+                            <div class="flex justify-between items-center">
+                                <h4 class="font-bold text-emerald-800 text-sm"><i class="fa-solid fa-face-laugh-beam mr-1"></i> Meme Bahagia / Lulus (Skor &ge; 70)</h4>
+                                <span class="text-xs text-emerald-600 font-bold">3 Slot Gambar</span>
+                            </div>
+                            <p class="text-xs text-slate-600">Upload file gambar meme untuk siswa yang mencapai skor tinggi.</p>
+
+                            <div id="happyMemePreview" class="grid grid-cols-3 gap-2">
+                                <!-- Populated dynamically -->
+                            </div>
+
+                            <input type="file" id="happyMemeInput" accept="image/*" class="text-xs text-slate-500 file:mr-2 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-600 file:text-white hover:file:bg-emerald-700">
+                        </div>
+
+                        <!-- Sad Memes Upload (Low Score < 70) -->
+                        <div class="p-4 bg-rose-50 rounded-2xl border border-rose-200 space-y-3">
+                            <div class="flex justify-between items-center">
+                                <h4 class="font-bold text-rose-800 text-sm"><i class="fa-solid fa-face-sad-tear mr-1"></i> Meme Sedih / Remedial (Skor &lt; 70)</h4>
+                                <span class="text-xs text-rose-600 font-bold">3 Slot Gambar</span>
+                            </div>
+                            <p class="text-xs text-slate-600">Upload file gambar meme untuk siswa yang butuh perbaikan.</p>
+
+                            <div id="sadMemePreview" class="grid grid-cols-3 gap-2">
+                                <!-- Populated dynamically -->
+                            </div>
+
+                            <input type="file" id="sadMemeInput" accept="image/*" class="text-xs text-slate-500 file:mr-2 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-rose-600 file:text-white hover:file:bg-rose-700">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL: TEACHER AUTHENTICATION -->
+    <div id="teacherAuthModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-softgray-200 space-y-4">
+            <div class="text-center">
+                <div class="inline-flex p-3 bg-brand-100 text-brand-700 rounded-full mb-2">
+                    <i class="fa-solid fa-lock text-xl"></i>
+                </div>
+                <h3 class="font-bold text-lg text-slate-800">Masuk Panel Guru</h3>
+                <p class="text-xs text-slate-500 mt-1">Masukkan kata sandi guru untuk mengakses data.</p>
+            </div>
+
+            <div>
+                <input type="password" id="teacherPasscode" placeholder="Kata sandi (Default: *******)" class="w-full p-3 rounded-xl border border-softgray-300 text-sm focus:ring-2 focus:ring-brand-500">
+            </div>
+
+            <div id="teacherAuthError" class="hidden text-xs text-red-600 bg-red-50 p-2 rounded-lg border border-red-200">
+                Kata sandi salah! Cobalah "*******".
+            </div>
+
+            <div class="flex space-x-2">
+                <button onclick="toggleTeacherAuthModal()" class="flex-1 py-2.5 bg-softgray-200 text-slate-700 font-semibold rounded-xl text-xs">Batal</button>
+                <button onclick="verifyTeacherPasscode()" class="flex-1 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl text-xs">Masuk</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: ESSAY GRADING & REVIEW (GURU ONLY) -->
+    <div id="essayGradingModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl max-w-3xl w-full p-6 shadow-2xl border border-softgray-200 space-y-4 max-h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center border-b border-softgray-200 pb-3">
+                <div>
+                    <h3 class="font-bold text-lg text-slate-800">Penilaian Essay & Review Jawaban</h3>
+                    <p id="gradingStudentMeta" class="text-xs text-brand-600 font-medium">Siswa: -</p>
+                </div>
+                <button onclick="closeEssayModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+
+            <div id="essayGradingContent" class="space-y-6 overflow-y-auto pr-2 flex-grow">
+                <!-- Populated dynamically via JavaScript -->
+            </div>
+
+            <div class="border-t border-softgray-200 pt-3 flex justify-end space-x-3">
+                <button onclick="closeEssayModal()" class="px-4 py-2 bg-softgray-200 text-slate-700 rounded-xl text-xs font-semibold">Tutup</button>
+                <button onclick="saveEssayGrading()" class="px-5 py-2 bg-brand-600 text-white rounded-xl text-xs font-bold shadow-md hover:bg-brand-700">Simpan Penilaian</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-white border-t border-softgray-200 py-4 text-center text-xs text-slate-400">
+        <p>&copy; 2026 Asesment Browser • Anti-Cheating Educational System</p>
+    </footer>
+
+    <script>
+        /* ==========================================================================
+           1. QUESTION DATASET (28 Questions)
+           ========================================================================== */
+        const initialQuestionsData = [
+            // PG (1-12)
+            {
+                id: 1,
+                type: "PG",
+                text: "Budi makan siang dengan menu ayam goreng tepung yang kaya protein dan lemak. Di lambung, normalnya terjadi pencernaan kimiawi oleh enzim pepsin dan asam klorida (HCl). Jika pada suatu kondisi lambung Budi mengalami penurunan produksi HCl secara drastis, analisis apa yang akan terjadi pada proses pencernaan protein di organ tersebut?",
+                options: [
+                    "Pencernaan protein tetap berjalan normal karena dibantu sepenuhnya oleh enzim ptialin di dalam lambung.",
+                    "Protein tidak dapat dicerna secara optimal karena pepsinogen tidak teraktivasi menjadi pepsin tanpa suasana asam dari HCl.",
+                    "Lemak pada ayam goreng akan langsung dicerna di lambung tanpa bantuan empedu.",
+                    "Penyerapan glukosa di lambung akan meningkat drastis menggantikan fungsi usus halus"
+                ],
+                correctAnswer: "Protein tidak dapat dicerna secara optimal karena pepsinogen tidak teraktivasi menjadi pepsin tanpa suasana asam dari HCl.",
+                explanation: "HCl diperlukan untuk mengaktifkan pepsinogen menjadi pepsin, enzim proteolitik utama di lambung."
+            },
+            {
+                id: 2,
+                type: "PG",
+                text: "Sekelompok siswa mengalami diare setelah mengonsumsi makanan dari kantin yang kurang higienis. Berdasarkan konsep fisiologi pencernaan, bagian organ manakah yang mengalami gangguan penyerapan paling parah sehingga menyebabkan feses berair?",
+                options: [
+                    "Esofagus, karena terjadi hambatan gerak peristaltik makanan ke lambung.",
+                    "Lambung, akibat sekresi asam berlebih yang mencairkan isi makanan.",
+                    "Duodenum, karena produksi getah pankreas terhenti total oleh bakteri.",
+                    "Usus besar (kolon), karena infeksi bakteri mengganggu proses penyerapan kembali air dari sisa makanan."
+                ],
+                correctAnswer: "Usus besar (kolon), karena infeksi bakteri mengganggu proses penyerapan kembali air dari sisa makanan.",
+                explanation: "Usus besar bertanggung jawab mengabsorpsi air dari sisa makanan. Gangguan pada proses ini menyebabkan feses berair."
+            },
+            {
+                id: 3,
+                type: "PG",
+                text: "Dalam keadaan darurat di rumah sakit, seorang pasien bergolongan darah AB memerlukan transfusi darah. Analisis mengapa golongan darah AB dapat menerima darah dari berbagai jenis golongan darah lain!",
+                options: [
+                    "Memiliki aglutinin alfa dan beta di dalam plasma darahnya secara lengkap.",
+                    "Tidak memiliki antibodi (aglutinin) alfa maupun beta di dalam plasma darahnya, sehingga tidak terjadi penggumpalan darah donor.",
+                    "Memiliki sel darah merah tanpa inti yang tahan terhadap semua jenis protein asing.",
+                    "Memproduksi trombosit dalam jumlah berlimpah untuk melawan aglutinogen asing."
+                ],
+                correctAnswer: "Tidak memiliki antibodi (aglutinin) alfa maupun beta di dalam plasma darahnya, sehingga tidak terjadi penggumpalan darah donor.",
+                explanation: "Darah AB tidak memiliki aglutinin (antibodi), sehingga dapat menerima darah dari semua golongan."
+            },
+            {
+                id: 4,
+                type: "PG",
+                text: "Rina sering merasa pusing, cepat lelah, dan wajahnya pucat karena didiagnosis mengalami anemia akibat kekurangan zat besi. Analisis bagaimana kondisi ini menurunkan kebugaran tubuh Rina!",
+                options: [
+                    "Darah kehilangan kemampuan membekukan luka karena kekurangan trombosit darah.",
+                    "Jantung berhenti memompa darah ke seluruh tubuh karena kelebihan plasma darah.",
+                    "Kadar hemoglobin menurun sehingga kapasitas darah mengikat dan mengantar oksigen ke sel-sel tubuh berkurang, menghambat respirasi seluler.",
+                    "Sel darah putih menyerang jaringan tubuh sendiri karena salah mengenali zat besi."
+                ],
+                correctAnswer: "Kadar hemoglobin menurun sehingga kapasitas darah mengikat dan mengantar oksigen ke sel-sel tubuh berkurang, menghambat respirasi seluler.",
+                explanation: "Hemoglobin mengikat oksigen. Kekurangan hemoglobin mengurangi kapasitas pengangkutan oksigen, menyebabkan gejala anemia."
+            },
+            {
+                id: 5,
+                type: "PG",
+                text: "Organ pencernaan manusia yang dinding bagian dalamnya memiliki lipatan-lipatan kecil berbentuk seperti jari yang disebut vili untuk memperluas area penyerapan, sehingga berfungsi sebagai tempat penyerapan sebagian besar sari-sari makanan ke dalam aliran darah adalah ...",
+                options: ["Mulut", "Lambung", "Usus halus", "Usus besar"],
+                correctAnswer: "Usus halus",
+                explanation: "Usus halus memiliki vili yang memperluas area penyerapan nutrisi."
+            },
+            {
+                id: 6,
+                type: "PG",
+                text: "Organ peredaran darah manusia yang memiliki dinding otot paling tebal dan kuat di antara ruang lainnya, sehingga mampu menghasilkan tekanan tinggi untuk memompa darah kaya oksigen (O₂) ke seluruh jaringan tubuh melalui pembuluh aorta adalah ...",
+                options: ["Serambi kanan", "Bilik kanan", "Serambi kiri", "Bilik kiri"],
+                correctAnswer: "Bilik kiri",
+                explanation: "Bilik kiri memiliki otot paling tebal untuk memompa darah ke seluruh tubuh."
+            },
+            {
+                id: 7,
+                type: "PG",
+                text: "Perbedaan mendasar antara pernapasan dada dan pernapasan perut adalah….",
+                options: [
+                    "Pernapasan dada melibatkan diafragma, sedangkan pernapasan perut melibatkan otot perut",
+                    "Pernapasan dada melibatkan tulang rusuk, sedangkan pernapasan perut melibatkan diafragma",
+                    "Pernapasan dada melibatkan diafragma, sedangkan pernapasan perut melibatkan paru-paru",
+                    "Pernapasan dada melibatkan rongga dada, sedangkan pernapasan perut melibatkan diafragma"
+                ],
+                correctAnswer: "Pernapasan dada melibatkan tulang rusuk, sedangkan pernapasan perut melibatkan diafragma",
+                explanation: "Pernapasan dada melibatkan otot interkostal dan tulang rusuk; pernapasan perut melibatkan diafragma."
+            },
+            {
+                id: 8,
+                type: "PG",
+                text: "Gas oksigen yang masuk ke paru-paru harus diangkut menuju ke jaringan tubuh yang membutuhkan. Mekanisme pengangkutan oksigen menuju ke jaringan tubuh adalah dalam bentuk ….",
+                options: [
+                    "Oksigen bebas, diangkut melalui sel darah putih",
+                    "Oksigen bebas, diangkut melalui sel darah merah",
+                    "Oksihemoglobin, diangkut melalui sel darah merah",
+                    "Oksihemoglobin, diangkut melalui plasma darah"
+                ],
+                correctAnswer: "Oksihemoglobin, diangkut melalui sel darah merah",
+                explanation: "Oksigen berikatan dengan hemoglobin membentuk oksihemoglobin dan diangkut oleh sel darah merah."
+            },
+            {
+                id: 9,
+                type: "PG",
+                text: "Tar merupakan cairan kental berwarna coklat tua atau hitam yang terkandung dalam rokok. Berikut yang bukan termasuk bahaya tar dalam tubuh adalah ….",
+                options: [
+                    "Menyebabkan darah mudah menggumpal",
+                    "Mengurangi produksi sperma, impotensi, dan kanker testis",
+                    "Meningkatkan produksi lendir dan cairan paru-paru",
+                    "Membunuh sel-sel pada saluran pernapasan dan paru-paru"
+                ],
+                correctAnswer: "Meningkatkan produksi lendir dan cairan paru-paru",
+                explanation: "Tar mengurangi (bukan meningkatkan) produksi lendir. Pilihan C adalah pernyataan yang bukan bahaya tar."
+            },
+            {
+                id: 10,
+                type: "PG",
+                text: "Perhatikan gambar struktur kulit berikut! [Lapisan kulit A=Epidermis, B=Dermis, C=Hipodermis]. Berdasarkan gambar tersebut, pernyataan yang benar adalah….",
+                options: [
+                    "Lapisan A terdiri atas lapisan stratum korneum, lusidum, granulosum dan adiposa.",
+                    "Lapisan B merupakan lapisan yang terletak di bawah lapisan dermis dan hipodermis",
+                    "Lapisan C mampu berperan dalam membentuk kontur tubuh seseorang.",
+                    "Lapisan A disebut juga dengan lapisan hipodermis yang berfungsi sebagai pelindung tubuh dari lingkungan luar."
+                ],
+                correctAnswer: "Lapisan C mampu berperan dalam membentuk kontur tubuh seseorang.",
+                explanation: "Hipodermis (lapisan C) banyak mengandung jaringan lemak dan membentuk kontur tubuh."
+            },
+            {
+                id: 11,
+                type: "PG",
+                text: "Perhatikan keterangan berikut! 1) tempat pembongkaran sel darah merah 2) tempat sintesis asam lemak 3) mengubah glukosa menjadi glikogen 4) tempat penyimpanan vitamin C. Berdasarkan keterangan di atas, yang merupakan fungsi hati yaitu nomor...",
+                options: ["3 dan 4", "2 dan 4", "1 dan 2", "1 dan 3"],
+                correctAnswer: "1 dan 3",
+                explanation: "Hati membongkar sel darah merah di bagian sel Kupffer dan mengubah glukosa menjadi glikogen."
+            },
+            {
+                id: 12,
+                type: "PG",
+                text: "Pernyataan di bawah ini yang benar adalah...",
+                options: [
+                    "Penyakit batu ginjal disebabkan seringnya memakan makanan yang tidak bersih",
+                    "Penyakit batu ginjal disebabkan oleh adanya endapan kristal kalsium karbonat pada ginjal",
+                    "Gagal ginjal terjadi karena saluran darah yang menuju ginjal pecah atau rusak",
+                    "Gagal ginjal terjadi karena ginjal tidak mensintesis urin"
+                ],
+                correctAnswer: "Penyakit batu ginjal disebabkan oleh adanya endapan kristal kalsium karbonat pada ginjal",
+                explanation: "Batu ginjal terbentuk dari endapan mineral (terutama kalsium karbonat) dalam ginjal."
+            },
+
+            // PGK (13-20)
+            {
+                id: 13,
+                type: "PGK",
+                text: "Tubuh manusia membutuhkan karbohidrat, protein, lemak vitamin dan mineral untuk menjaga kelangsungan fungsi organ dan pertumbuhan. Tentukan apakah pernyataan-pernyataan berikut berdasarkan fungsi dan pencernaan zat makanan dalam tubuh! (Pilih lebih dari satu)",
+                options: [
+                    "Karbohidrat kompleks seperti amilum mulai dicerna secara kimiawi di mulut dengan bantuan enzim ptialin menjadi maltosa.",
+                    "Lemak merupakan sumber energi utama yang paling pertama dipecah oleh tubuh saat melakukan aktivitas fisik berat.",
+                    "Kekurangan protein dalam jangka panjang pada anak-anak dapat menyebabkan gangguan pertumbuhan yang dikenal sebagai kwashiorkor.",
+                    "Vitamin dan mineral menghasilkan energi dalam jumlah besar setelah dipecah oleh enzim-enzim di lambung dan usus halus."
+                ],
+                correctAnswer: [
+                    "Karbohidrat kompleks seperti amilum mulai dicerna secara kimiawi di mulut dengan bantuan enzim ptialin menjadi maltosa.",
+                    "Kekurangan protein dalam jangka panjang pada anak-anak dapat menyebabkan gangguan pertumbuhan yang dikenal sebagai kwashiorkor."
+                ],
+                explanation: "A benar: ptialin mencerna amilum. C benar: kwashiorkor akibat kekurangan protein. B salah: glukosa adalah energi utama. D salah: vitamin/mineral tidak menghasilkan energi."
+            },
+            {
+                id: 14,
+                type: "PGK",
+                text: "Darah merupakan jaringan ikat khusus yang terdiri atas plasma darah dan sel-sel darah. Setiap komponen penyusun darah memiliki struktur dan peran yang spesifik dalam menjaga kelangsungan hidup manusia. Berdasarkan karakteristik dan fungsi komponen darah pada manusia, manakah pernyataan-pernyataan berikut yang benar? (Pilih lebih dari satu)",
+                options: [
+                    "Eritrosit (sel darah merah) berbentuk bikonkaf, tidak memiliki inti sel saat matang, dan mengandung hemoglobin untuk mengikat oksigen.",
+                    "Leukosit (sel darah putih) berfungsi utama mengangkut nutrisi dan sari-sari makanan hasil pencernaan ke seluruh sel tubuh.",
+                    "Trombosit (keping darah) berbentuk tidak teratur, tidak berinti, dan berperan penting dalam proses pembekuan darah saat terjadi luka.",
+                    "Seseorang yang mengalami infeksi bakteri umumnya akan mengalami penurunan jumlah leukosit di dalam darahnya secara drastis."
+                ],
+                correctAnswer: [
+                    "Eritrosit (sel darah merah) berbentuk bikonkaf, tidak memiliki inti sel saat matang, dan mengandung hemoglobin untuk mengikat oksigen.",
+                    "Trombosit (keping darah) berbentuk tidak teratur, tidak berinti, dan berperan penting dalam proses pembekuan darah saat terjadi luka."
+                ],
+                explanation: "A dan C benar. B salah (fungsi imunitas). D salah (infeksi biasanya meningkatkan leukosit)."
+            },
+            {
+                id: 15,
+                type: "PGK",
+                text: "Sistem peredaran darah manusia merupakan sistem peredaran darah ganda tertutup yang terdiri atas peredaran darah kecil dan peredaran darah besar. Berdasarkan jalur dan karakteristik aliran darah dalam tubuh manusia, manakah pernyataan-pernyataan berikut yang benar? (Pilih lebih dari satu)",
+                options: [
+                    "Peredaran darah kecil dimulai dari bilik kanan (right ventricle) menuju paru-paru melalui arteri pulmonalis, lalu kembali ke serambi kiri (left atrium) melalui vena pulmonalis.",
+                    "Darah yang mengalir dalam arteri pulmonalis kaya akan oksigen (O₂) karena baru saja dipompa keluar dari jantung.",
+                    "Peredaran darah besar berfungsi mengalirkan darah yang kaya oksigen dari bilik kiri (left ventricle) ke seluruh jaringan tubuh melalui aorta.",
+                    "Pembuluh vena cava mengangkut darah kaya karbondioksida (CO₂) dari seluruh jaringan tubuh menuju ke serambi kanan (right atrium) jantung."
+                ],
+                correctAnswer: [
+                    "Peredaran darah kecil dimulai dari bilik kanan (right ventricle) menuju paru-paru melalui arteri pulmonalis, lalu kembali ke serambi kiri (left atrium) melalui vena pulmonalis.",
+                    "Peredaran darah besar berfungsi mengalirkan darah yang kaya oksigen dari bilik kiri (left ventricle) ke seluruh jaringan tubuh melalui aorta.",
+                    "Pembuluh vena cava mengangkut darah kaya karbondioksida (CO₂) dari seluruh jaringan tubuh menuju ke serambi kanan (right atrium) jantung."
+                ],
+                explanation: "A, C, D benar. B salah: arteri pulmonalis membawa darah miskin O2."
+            },
+            {
+                id: 16,
+                type: "PGK",
+                text: "Selain organ saluran utama, proses pencernaan manusia sangat bergantung pada organ aksesori (pendukung) seperti hati, kantung empedu, dan pankreas. Manakah pernyataan-pernyataan berikut yang benar mengenai peran organ pencernaan pendukung beserta zat yang dihasilkannya? (Pilih lebih dari satu)",
+                options: [
+                    "Getah empedu yang dihasilkan oleh hati berfungsi mengemulsikan lemak agar molekul lemak dapat dipecah lebih efektif oleh enzim lipase.",
+                    "Pankreas menyekresikan enzim amilase, lipase, dan tripsinogen ke dalam usus dua belas jari.",
+                    "Enzim tripsin bertugas memecah pepton/protein menjadi asam amino di dalam usus halus.",
+                    "Kantung empedu menghasilkan enzim renin yang berfungsi mengumpulkan protein susu (kasein)."
+                ],
+                correctAnswer: [
+                    "Getah empedu yang dihasilkan oleh hati berfungsi mengemulsikan lemak agar molekul lemak dapat dipecah lebih efektif oleh enzim lipase.",
+                    "Pankreas menyekresikan enzim amilase, lipase, dan tripsinogen ke dalam usus dua belas jari.",
+                    "Enzim tripsin bertugas memecah pepton/protein menjadi asam amino di dalam usus halus."
+                ],
+                explanation: "A, B, C benar. D salah: empedu tidak menghasilkan renin."
+            },
+            {
+                id: 17,
+                type: "PGK",
+                text: "Perhatikan gambar jalur masuk udara berikut: Hidung → Faring → Laring → Trakea → Bronkus → Bronkiolus → Alveolus. Berdasarkan jalur tersebut, pernyataan yang benar adalah ….",
+                options: [
+                    "Laring berfungsi mengontrol suhu udara yang masuk ke dalam paru-paru",
+                    "Trakea tersusun atas otot polos dan tulang rawan yang menyerupai cincin sebanyak 16-22 buah.",
+                    "Pertukaran gas O₂ dan CO₂ terjadi secara difusi di dalam alveoli.",
+                    "Pangkal rongga mulut yang berhubungan dengan rongga hidung terdapat suatu katup yang disebut epiglottis"
+                ],
+                correctAnswer: [
+                    "Pertukaran gas O₂ dan CO₂ terjadi secara difusi di dalam alveoli.",
+                    "Pangkal rongga mulut yang berhubungan dengan rongga hidung terdapat suatu katup yang disebut epiglottis"
+                ],
+                explanation: "C dan D benar."
+            },
+            {
+                id: 18,
+                type: "PGK",
+                text: "Berdasarkan proses terjadinya, pernapasan manusia mempunyai dua tahapan pertukaran gas, yaitu pernapasan eksternal dan internal. Manakah pernyataan berikut yang benar….",
+                options: [
+                    "Pernapasan eksternal merupakan pertukaran O₂ dari udara dengan CO₂ dari alveolus ke dalam kapiler darah",
+                    "Pernapasan eksternal merupakan pertukaran O₂ dari udara dengan CO₂ dari kapiler darah dalam alveolus.",
+                    "Pernapasan internal merupakan proses pertukaran O₂ dan CO₂ dari kapiler darah ke alveolus",
+                    "Pernapasan internal merupakan proses pertukaran O₂ dan CO₂ dari kapiler darah ke sel-sel tubuh."
+                ],
+                correctAnswer: [
+                    "Pernapasan eksternal merupakan pertukaran O₂ dari udara dengan CO₂ dari alveolus ke dalam kapiler darah",
+                    "Pernapasan internal merupakan proses pertukaran O₂ dan CO₂ dari kapiler darah ke sel-sel tubuh."
+                ],
+                explanation: "A dan D benar."
+            },
+            {
+                id: 19,
+                type: "PGK",
+                text: "Kulit tersusun atas 3 lapisan yaitu lapisan epidermis, dermis dan hipodermis. Berdasarkan struktur lapisan kulit, pernyataan yang benar adalah….",
+                options: [
+                    "Epidermis merupakan lapisan terluar kulit yang berfungsi melindungi tubuh dari kuman dan zat asing",
+                    "Lapisan epidermis merupakan lapisan terluar yang berfungsi sebagai cadangan energi atau makanan",
+                    "Lapisan dermis mengandung pembuluh darah, ujung saraf, kelenjar keringat, dan folikel rambut",
+                    "Hipodermis mampu berperan dalam membentuk kontur tubuh seseorang"
+                ],
+                correctAnswer: [
+                    "Epidermis merupakan lapisan terluar kulit yang berfungsi melindungi tubuh dari kuman dan zat asing",
+                    "Lapisan dermis mengandung pembuluh darah, ujung saraf, kelenjar keringat, dan folikel rambut",
+                    "Hipodermis mampu berperan dalam membentuk kontur tubuh seseorang"
+                ],
+                explanation: "A, C, D benar."
+            },
+            {
+                id: 20,
+                type: "PGK",
+                text: "Proses pembentukan urin meliputi 3 tahapan yaitu: Filtrasi, Reabsorpsi, dan Augmentasi. Perhatikan pernyataan berikut!",
+                options: [
+                    "Filtrasi terjadi di glomerulus dan menghasilkan urin primer yang masih mengandung air, glukosa, asam amino, dan garam mineral.",
+                    "Reabsorpsi merupakan proses penyaringan darah di glomerulus sehingga terbentuk urin sekunder.",
+                    "Reabsorpsi terjadi di tubulus kontortus proksimal menghasilkan urine sekunder",
+                    "Augmentasi terjadi di tubulus kontortus distal dengan menghasilkan urine yang sesungguhnya."
+                ],
+                correctAnswer: [
+                    "Filtrasi terjadi di glomerulus dan menghasilkan urin primer yang masih mengandung air, glukosa, asam amino, dan garam mineral.",
+                    "Reabsorpsi terjadi di tubulus kontortus proksimal menghasilkan urine sekunder",
+                    "Augmentasi terjadi di tubulus kontortus distal dengan menghasilkan urine yang sesungguhnya."
+                ],
+                explanation: "A, C, D benar."
+            },
+
+            // BS (21-24)
+            {
+                id: 21,
+                type: "BS",
+                text: "Jika pankreas sudah tidak mampu melaksanakan fungsinya, tubuh kita akan dapat terkena penyakit jantung.",
+                options: ["Benar", "Salah"],
+                correctAnswer: "Salah",
+                explanation: "Pankreas yang tidak berfungsi menyebabkan diabetes, bukan penyakit jantung secara langsung."
+            },
+            {
+                id: 22,
+                type: "BS",
+                text: "Orang yang kekurangan protein terus menerus akan terkena penyakit busung lapar.",
+                options: ["Benar", "Salah"],
+                correctAnswer: "Benar",
+                explanation: "Kwashiorkor (busung lapar) disebabkan kekurangan protein jangka panjang."
+            },
+            {
+                id: 23,
+                type: "BS",
+                text: "Darah yang terdapat dalam bilik kanan merupakan darah yang kaya akan karbondioksida, berasal dari seluruh tubuh yang merupakan hasil oksidasi biologis.",
+                options: ["Benar", "Salah"],
+                correctAnswer: "Benar",
+                explanation: "Bilik kanan menerima darah miskin O2 (kaya CO2) dari seluruh tubuh."
+            },
+            {
+                id: 24,
+                type: "BS",
+                text: "Sisa metabolisme dari pernapasan berupa karbon monoksida dan uap air.",
+                options: ["Benar", "Salah"],
+                correctAnswer: "Salah",
+                explanation: "Sisa metabolisme pernapasan adalah karbon dioksida (CO2), bukan karbon monoksida (CO)."
+            },
+
+            // ESSAY (25-28)
+            {
+                id: 25,
+                type: "ESSAY",
+                text: "Jelaskan perbedaan antara pencernaan mekanis dan pencernaan kimiawi yang terjadi pada organ mulut manusia! Sebutkan pula organ atau zat yang terlibat dalam masing-masing proses tersebut.",
+                points: 10,
+                rubric: "1. Penjelasan pencernaan mekanis (penggilingan/pelumat gigi): 2 poin\n2. Penjelasan pencernaan kimiawi (enzim ptialin/amilase): 3 poin\n3. Penyebutan organ/zat terlibat (gigi, lidah, kelenjar ludah): 2 poin\n4. Kejelasan dan struktur tulisan: 3 poin"
+            },
+            {
+                id: 26,
+                type: "ESSAY",
+                text: "Perhatikan diagram peredaran darah! Tuliskan urutan skema Peredaran Darah Kecil (Pulmonalis) dan Peredaran Darah Besar (Sistemik), berikan penjelasan serta keterangan pertukaran gas yang terjadi!",
+                points: 20,
+                rubric: "1. Skema peredaran darah kecil (Jantung -> Paru-paru -> Jantung): 5 poin\n2. Skema peredaran darah besar (Jantung -> Jaringan Tubuh -> Jantung): 5 poin\n3. Penjelasan pertukaran gas di paru-paru (CO2 dilepas, O2 diikat): 5 poin\n4. Penjelasan pertukaran gas di jaringan tubuh: 5 poin"
+            },
+            {
+                id: 27,
+                type: "ESSAY",
+                text: "Apakah jika dalam kondisi lari-lari kecil, frekuensi pernapasan kamu berada di atas rata-rata frekuensi normal? Jelaskan alasannya!",
+                points: 10,
+                rubric: "1. Jawaban Ya/Tidak dengan logika tepat: 2 poin\n2. Penjelasan peningkatan kebutuhan oksigen saat aktivitas: 4 poin\n3. Penjelasan mekanisme respon paru-paru dan otot: 4 poin"
+            },
+            {
+                id: 28,
+                type: "ESSAY",
+                text: "Sebutkan dan jelaskan fungsi dari 4 organ pencernaan utama pada manusia beserta peran pentingnya dalam metabolisme!",
+                points: 20,
+                rubric: "1. Identifikasi 4 organ utama secara tepat: 8 poin\n2. Penjelasan rinci fungsi masing-masing organ: 12 poin"
+            }
+        ];
+
+        /* ==========================================================================
+           2. GLOBAL STATE & LOCAL STORAGE INITIALIZATION
+           ========================================================================== */
+        let questions = JSON.parse(localStorage.getItem('ab_questions')) || initialQuestionsData;
+        let usedPINs = JSON.parse(localStorage.getItem('ab_used_pins')) || [];
+        let lockedPINs = JSON.parse(localStorage.getItem('ab_locked_pins')) || [];
+        let studentSubmissions = JSON.parse(localStorage.getItem('ab_submissions')) || [];
+        
+        let memeStore = JSON.parse(localStorage.getItem('ab_memes')) || {
+            happy: [
+                'https://placehold.co/600x400/8b5cf6/ffffff?text=LULUS!+Hebat+Sekali!',
+                'https://placehold.co/600x400/10b981/ffffff?text=Kerja+Bagus!+Nilai+Tinggi',
+                'https://placehold.co/600x400/3b82f6/ffffff?text=Pertahankan+Prestasimu!'
+            ],
+            sad: [
+                'https://placehold.co/600x400/ef4444/ffffff?text=Jangan+Menyerah!+Coba+Lagi',
+                'https://placehold.co/600x400/f59e0b/ffffff?text=Tetap+Semangat+Belajar',
+                'https://placehold.co/600x400/64748b/ffffff?text=Perlu+Tingkatkan+Latihan'
+            ]
+        };
+
+        // Current Student Session State
+        let currentStudent = null;
+        let currentExamQuestions = [];
+        let currentQuestionIndex = 0;
+        let studentAnswers = {};
+        let fraudViolations = 0;
+        let perQuestionTimer = null;
+        let timeLeft = 30;
+        let isExamActive = false;
+        let currentViewMode = 'question'; // 'question' or 'options'
+
+        /* ==========================================================================
+           3. AUTHENTICATION & EXAM START LOGIC
+           ========================================================================== */
+        function handleStartExam(e) {
+            e.preventDefault();
+            const name = document.getElementById('studentName').value.trim();
+            const studentClass = document.getElementById('studentClass').value;
+            const dob = document.getElementById('studentDob').value;
+            const pin = document.getElementById('studentPin').value.trim().toUpperCase();
+
+            const alertBox = document.getElementById('authAlert');
+            const alertMsg = document.getElementById('authAlertMsg');
+
+            if (!name || !studentClass || !dob || !pin) {
+                alertMsg.innerText = "Semua bidang data wajib diisi!";
+                alertBox.classList.remove('hidden');
+                return;
+            }
+
+            // Check if PIN is locked due to fraud
+            if (lockedPINs.some(item => item.pin === pin)) {
+                alertMsg.innerText = "PIN ini TERKUNCI PERMANEN karena terdeteksi pelanggaran kecurangan!";
+                alertBox.classList.remove('hidden');
+                return;
+            }
+
+            // Check if PIN was already used
+            if (usedPINs.includes(pin)) {
+                alertMsg.innerText = "PIN ini sudah pernah digunakan untuk ujian. Setiap PIN hanya berlaku 1 kali!";
+                alertBox.classList.remove('hidden');
+                return;
+            }
+
+            alertBox.classList.add('hidden');
+
+            // Initialize Session
+            currentStudent = { name, studentClass, dob, pin, startTime: new Date().toISOString() };
+            usedPINs.push(pin);
+            localStorage.setItem('ab_used_pins', JSON.stringify(usedPINs));
+
+            startExamSession();
+        }
+
+        function startExamSession() {
+            // Shuffle questions copy
+            currentExamQuestions = JSON.parse(JSON.stringify(questions));
+            shuffleArray(currentExamQuestions);
+
+            // Shuffle options for PG and PGK
+            currentExamQuestions.forEach(q => {
+                if ((q.type === 'PG' || q.type === 'PGK') && Array.isArray(q.options)) {
+                    shuffleArray(q.options);
+                }
+            });
+
+            currentQuestionIndex = 0;
+            studentAnswers = {};
+            fraudViolations = 0;
+            isExamActive = true;
+
+            // Update UI elements
+            document.getElementById('identityView').classList.add('hidden');
+            document.getElementById('resultsView').classList.add('hidden');
+            document.getElementById('examView').classList.remove('hidden');
+            document.getElementById('totalQuestionsNum').innerText = currentExamQuestions.length;
+            document.getElementById('fraudCountBadge').innerText = `Peringatan: ${fraudViolations}/2`;
+
+            // Register Fraud Protection Listeners
+            setupAntiCheatingListeners();
+
+            loadQuestion(0);
+        }
+
+        // Utility: Fisher-Yates Shuffle
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        /* ==========================================================================
+           4. EXAM ENGINE & INTERACTION LOGIC
+           ========================================================================== */
+        function loadQuestion(index) {
+            clearInterval(perQuestionTimer);
+            currentQuestionIndex = index;
+
+            const q = currentExamQuestions[index];
+            document.getElementById('currentQuestionNum').innerText = index + 1;
+
+            // Set Category Badge & Timer duration based on question type
+            const badge = document.getElementById('questionCategoryBadge');
+            if (q.type === 'PG') {
+                badge.innerText = "Pilihan Ganda";
+                badge.className = "px-3 py-1 bg-brand-100 text-brand-700 rounded-full text-xs font-bold uppercase tracking-wider";
+                timeLeft = 30;
+            } else if (q.type === 'PGK') {
+                badge.innerText = "Pilihan Ganda Kompleks (Multi-Jawaban)";
+                badge.className = "px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-bold uppercase tracking-wider";
+                timeLeft = 30;
+            } else if (q.type === 'BS') {
+                badge.innerText = "Benar / Salah";
+                badge.className = "px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-xs font-bold uppercase tracking-wider";
+                timeLeft = 50;
+            } else if (q.type === 'ESSAY') {
+                badge.innerText = "Essay / Uraian";
+                badge.className = "px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-bold uppercase tracking-wider";
+                timeLeft = 90;
+            }
+
+            // Render Question Text
+            document.getElementById('questionText').innerText = q.text;
+
+            // Render Options Area
+            renderOptionsArea(q);
+
+            // Default View Mode: Tampilkan Teks Soal terlebih dahulu
+            setQuestionViewMode('question');
+
+            // Show confirm button ONLY for PGK and ESSAY (since PG and BS auto-advance on click)
+            const confirmBtn = document.getElementById('confirmNextBtn');
+            const confirmBtnText = document.getElementById('confirmBtnText');
+            if (q.type === 'PGK' || q.type === 'ESSAY') {
+                confirmBtn.classList.remove('hidden');
+                confirmBtnText.innerText = (index === currentExamQuestions.length - 1) ? "Simpan & Selesaikan Ujian" : "Simpan & Lanjut";
+            } else {
+                confirmBtn.classList.add('hidden');
+            }
+
+            // Start Per-Question Countdown Timer
+            startTimer();
+        }
+
+        function setQuestionViewMode(mode) {
+            currentViewMode = mode;
+            const qContainer = document.getElementById('questionContainer');
+            const oContainer = document.getElementById('optionsContainer');
+            const qBtn = document.getElementById('toggleQuestionBtn');
+            const oBtn = document.getElementById('toggleOptionsBtn');
+
+            if (mode === 'question') {
+                qContainer.classList.remove('hidden');
+                oContainer.classList.add('hidden');
+
+                qBtn.className = "flex-1 py-2 px-4 rounded-lg font-semibold text-xs sm:text-sm transition-all bg-brand-600 text-white flex items-center justify-center space-x-2";
+                oBtn.className = "flex-1 py-2 px-4 rounded-lg font-semibold text-xs sm:text-sm transition-all bg-softgray-100 text-slate-600 hover:bg-softgray-200 flex items-center justify-center space-x-2";
+            } else {
+                qContainer.classList.add('hidden');
+                oContainer.classList.remove('hidden');
+
+                oBtn.className = "flex-1 py-2 px-4 rounded-lg font-semibold text-xs sm:text-sm transition-all bg-brand-600 text-white flex items-center justify-center space-x-2";
+                qBtn.className = "flex-1 py-2 px-4 rounded-lg font-semibold text-xs sm:text-sm transition-all bg-softgray-100 text-slate-600 hover:bg-softgray-200 flex items-center justify-center space-x-2";
+            }
+        }
+
+        function startTimer() {
+            const timerDisplay = document.getElementById('timerDisplay');
+            const timerIcon = document.getElementById('timerIcon');
+
+            function updateDisplay() {
+                const secs = timeLeft < 10 ? `0${timeLeft}` : `${timeLeft}`;
+                timerDisplay.innerText = `00:${secs}`;
+
+                if (timeLeft <= 5) {
+                    timerDisplay.classList.add('timer-warning');
+                    if (timerIcon) timerIcon.classList.add('timer-warning');
+                } else {
+                    timerDisplay.classList.remove('timer-warning');
+                    if (timerIcon) timerIcon.classList.remove('timer-warning');
+                }
+            }
+
+            updateDisplay();
+
+            perQuestionTimer = setInterval(() => {
+                timeLeft--;
+                updateDisplay();
+
+                if (timeLeft <= 0) {
+                    clearInterval(perQuestionTimer);
+                    submitAndNext();
+                }
+            }, 1000);
+        }
+
+        function renderOptionsArea(q) {
+            const optionsList = document.getElementById('optionsList');
+            const essayArea = document.getElementById('essayArea');
+            optionsList.innerHTML = '';
+
+            if (q.type === 'ESSAY') {
+                optionsList.classList.add('hidden');
+                essayArea.classList.remove('hidden');
+                const essayInput = document.getElementById('essayInput');
+                essayInput.value = studentAnswers[q.id]?.text || '';
+                return;
+            }
+
+            optionsList.classList.remove('hidden');
+            essayArea.classList.add('hidden');
+
+            if (q.type === 'PG' || q.type === 'BS') {
+                const existingSelection = studentAnswers[q.id]?.selected;
+
+                q.options.forEach((optText) => {
+                    const btn = document.createElement('button');
+                    let btnClass = "w-full p-3.5 rounded-xl border border-softgray-300 bg-white text-slate-700 hover:bg-brand-50 hover:border-brand-300 font-medium text-sm text-left transition-all flex items-center justify-between";
+
+                    if (existingSelection === optText) {
+                        btnClass = "w-full p-3.5 rounded-xl border-2 border-brand-600 bg-brand-50 text-brand-900 font-semibold text-sm text-left flex items-center justify-between";
+                    }
+
+                    btn.className = btnClass;
+                    btn.innerHTML = `<span>${optText}</span>`;
+                    btn.onclick = function() {
+                        handleSingleChoiceSelect(q, optText, btn);
+                    };
+                    optionsList.appendChild(btn);
+                });
+            } else if (q.type === 'PGK') {
+                if (!studentAnswers[q.id]) {
+                    studentAnswers[q.id] = { selected: [] };
+                }
+                const selectedArr = studentAnswers[q.id].selected || [];
+
+                q.options.forEach((optText) => {
+                    const isChecked = selectedArr.includes(optText);
+                    const label = document.createElement('label');
+                    label.className = `w-full p-3.5 rounded-xl border transition-all flex items-start space-x-3 cursor-pointer ${
+                        isChecked 
+                            ? 'border-purple-500 bg-purple-50 text-purple-900 font-semibold' 
+                            : 'border-softgray-300 bg-white text-slate-700 hover:bg-purple-50/50'
+                    }`;
+
+                    label.innerHTML = `
+                        <input type="checkbox" class="mt-0.5 rounded text-purple-600 focus:ring-purple-500 h-4 w-4" ${isChecked ? 'checked' : ''}>
+                        <span class="text-sm leading-relaxed flex-1">${optText}</span>
+                    `;
+
+                    const checkbox = label.querySelector('input');
+                    checkbox.onchange = function() {
+                        let curArr = studentAnswers[q.id].selected || [];
+                        if (checkbox.checked) {
+                            if (!curArr.includes(optText)) curArr.push(optText);
+                        } else {
+                            curArr = curArr.filter(item => item !== optText);
+                        }
+                        studentAnswers[q.id].selected = curArr;
+
+                        label.className = `w-full p-3.5 rounded-xl border transition-all flex items-start space-x-3 cursor-pointer ${
+                            checkbox.checked 
+                                ? 'border-purple-500 bg-purple-50 text-purple-900 font-semibold' 
+                                : 'border-softgray-300 bg-white text-slate-700 hover:bg-purple-50/50'
+                        }`;
+                    };
+
+                    optionsList.appendChild(label);
+                });
+            }
+        }
+
+        function handleSingleChoiceSelect(q, selectedText, btnElement) {
+            // Disable all option buttons to prevent re-selection or changing answers
+            const allBtns = document.querySelectorAll('#optionsList button');
+            allBtns.forEach(b => b.disabled = true);
+
+            const isCorrect = (selectedText === q.correctAnswer);
+            studentAnswers[q.id] = { selected: selectedText, isCorrect: isCorrect };
+
+            // Change button color visually
+            if (isCorrect) {
+                btnElement.className = "w-full p-3.5 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-800 font-semibold text-sm text-left flex items-center justify-between pointer-events-none";
+                btnElement.innerHTML = `<span>${selectedText}</span> <i class="fa-solid fa-circle-check text-emerald-600 text-base"></i>`;
+            } else {
+                btnElement.className = "w-full p-3.5 rounded-xl border-2 border-rose-500 bg-rose-50 text-rose-800 font-semibold text-sm text-left flex items-center justify-between pointer-events-none";
+                btnElement.innerHTML = `<span>${selectedText}</span> <i class="fa-solid fa-circle-xmark text-rose-600 text-base"></i>`;
+            }
+
+            // Otomatis lanjut ke soal berikutnya tanpa tombol kembali
+            setTimeout(() => {
+                submitAndNext();
+            }, 600);
+        }
+
+        function submitAndNext() {
+            saveCurrentState();
+            if (currentQuestionIndex < currentExamQuestions.length - 1) {
+                loadQuestion(currentQuestionIndex + 1);
+            } else {
+                finishExamSession();
+            }
+        }
+
+        function saveCurrentState() {
+            const q = currentExamQuestions[currentQuestionIndex];
+            if (!q) return;
+            if (q.type === 'ESSAY') {
+                const val = document.getElementById('essayInput').value.trim();
+                studentAnswers[q.id] = { text: val };
+            }
+        }
+
+        /* ==========================================================================
+           5. ANTI-CHEATING SECURITY SYSTEM
+           ========================================================================== */
+        function setupAntiCheatingListeners() {
+            // Prevent Copy/Paste/Cut & Context Menu
+            document.addEventListener('copy', blockEvent);
+            document.addEventListener('paste', blockEvent);
+            document.addEventListener('cut', blockEvent);
+            document.addEventListener('contextmenu', blockEvent);
+
+            // Tab / Window Blur Detection
+            window.onblur = function() {
+                if (!isExamActive) return;
+
+                fraudViolations++;
+                document.getElementById('fraudCountBadge').innerText = `Peringatan: ${fraudViolations}/2`;
+
+                if (fraudViolations > 2) {
+                    // Lock student account permanently and terminate exam
+                    terminateExamDueToFraud();
+                } else {
+                    showFraudAlertModal(`Peringatan Kecurangan (${fraudViolations}/2)! Anda terdeteksi meninggalkan tab atau jendela browser.`);
+                }
+            };
+        }
+
+        function removeAntiCheatingListeners() {
+            document.removeEventListener('copy', blockEvent);
+            document.removeEventListener('paste', blockEvent);
+            document.removeEventListener('cut', blockEvent);
+            document.removeEventListener('contextmenu', blockEvent);
+            window.onblur = null;
+        }
+
+        function blockEvent(e) {
+            if (isExamActive) {
+                e.preventDefault();
+                return false;
+            }
+        }
+
+        function showFraudAlertModal(msg) {
+            const alertBox = document.createElement('div');
+            alertBox.className = "fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4";
+            alertBox.innerHTML = `
+                <div class="bg-white rounded-2xl max-w-md w-full p-6 text-center space-y-4 shadow-2xl border border-red-200">
+                    <div class="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto text-2xl">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                    <h3 class="font-bold text-lg text-slate-800">Peringatan Kecurangan!</h3>
+                    <p class="text-xs text-slate-600">${msg}</p>
+                    <button onclick="this.parentElement.parentElement.remove()" class="w-full py-2.5 bg-red-600 text-white rounded-xl text-xs font-bold hover:bg-red-700">
+                        Saya Mengerti, Kembali ke Soal
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(alertBox);
+        }
+
+        function terminateExamDueToFraud() {
+            isExamActive = false;
+            clearInterval(perQuestionTimer);
+            removeAntiCheatingListeners();
+
+            // Lock PIN permanently
+            lockedPINs.push({
+                pin: currentStudent.pin,
+                name: currentStudent.name,
+                studentClass: currentStudent.studentClass,
+                timestamp: new Date().toLocaleString('id-ID'),
+                reason: "Melebihi batas toleransi perpindahan tab (> 2 kali)"
+            });
+            localStorage.setItem('ab_locked_pins', JSON.stringify(lockedPINs));
+
+            // Hide exam, show terminated view
+            document.getElementById('examView').classList.add('hidden');
+
+            const fraudScreen = document.createElement('div');
+            fraudScreen.className = "max-w-lg mx-auto bg-white rounded-2xl p-8 shadow-2xl border border-red-200 text-center space-y-4 mt-8";
+            fraudScreen.innerHTML = `
+                <div class="w-16 h-16 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto text-3xl">
+                    <i class="fa-solid fa-user-lock"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-red-700">Assessment Dihentikan</h2>
+                <p class="text-sm text-slate-600">Assessment dihentikan karena terdeteksi upaya kecurangan berulang.</p>
+                <div class="p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-800 font-semibold">
+                    Akun & PIN (${currentStudent.pin}) Anda telah terkunci secara permanen dan dicatat dalam laporan Guru.
+                </div>
+                <button onclick="location.reload()" class="px-6 py-2.5 bg-slate-800 text-white font-semibold rounded-xl text-xs">
+                    Kembali ke Halaman Utama
+                </button>
+            `;
+            document.getElementById('identityView').parentElement.appendChild(fraudScreen);
+        }
+
+        /* ==========================================================================
+           6. GRADING & FINAL RESULTS LOGIC
+           ========================================================================== */
+        function finishExamSession() {
+            isExamActive = false;
+            clearInterval(perQuestionTimer);
+            removeAntiCheatingListeners();
+
+            // Calculate Objective Score (PG, PGK, BS)
+            let totalObjectivePoints = 0;
+            let maxObjectivePoints = 0;
+
+            currentExamQuestions.forEach(q => {
+                const userAns = studentAnswers[q.id];
+
+                if (q.type === 'PG' || q.type === 'BS') {
+                    maxObjectivePoints += 10;
+                    if (userAns && userAns.selected === q.correctAnswer) {
+                        totalObjectivePoints += 10;
+                    }
+                } else if (q.type === 'PGK') {
+                    maxObjectivePoints += 10;
+                    if (userAns && Array.isArray(userAns.selected)) {
+                        // Compare sets
+                        const correctSet = new Set(q.correctAnswer);
+                        const userSet = new Set(userAns.selected);
+
+                        if (correctSet.size === userSet.size && [...correctSet].every(x => userSet.has(x))) {
+                            totalObjectivePoints += 10;
+                        }
+                    }
+                }
+            });
+
+            // Convert Objective Score to scale 0-100 (Objective portion = 60 points max scaled)
+            const scaledObjectiveScore = Math.round((totalObjectivePoints / maxObjectivePoints) * 60);
+
+            // Record Submission
+            const submissionRecord = {
+                student: currentStudent,
+                answers: studentAnswers,
+                questionsSnapshot: currentExamQuestions,
+                objectiveScore: scaledObjectiveScore,
+                essayScore: null, // Pending Guru
+                totalScore: scaledObjectiveScore,
+                essayStatus: "Belum Dinilai",
+                submittedAt: new Date().toLocaleString('id-ID')
+            };
+
+            studentSubmissions.push(submissionRecord);
+            localStorage.setItem('ab_submissions', JSON.stringify(studentSubmissions));
+
+            // Display Results
+            document.getElementById('examView').classList.add('hidden');
+            document.getElementById('resultsView').classList.remove('hidden');
+
+            document.getElementById('studentResultGreeting').innerText = `Siswa: ${currentStudent.name} (${currentStudent.studentClass})`;
+            document.getElementById('scoreDisplay').innerText = `${scaledObjectiveScore}/100`;
+
+            // Encouragement & Meme Selection
+            const encBox = document.getElementById('encouragementBox');
+            const memeImg = document.getElementById('resultMemeImg');
+
+            if (scaledObjectiveScore >= 70) {
+                encBox.innerText = "Bagus sekali! Kamu menunjukkan pemahaman yang sangat tinggi!";
+                encBox.className = "p-4 rounded-xl bg-emerald-50 text-emerald-800 font-semibold text-base border border-emerald-200";
+                // Select happy meme
+                const randMeme = memeStore.happy[Math.floor(Math.random() * memeStore.happy.length)];
+                memeImg.src = randMeme;
+            } else {
+                encBox.innerText = "Tetap semangat! Jangan berkecil hati, tingkatkan latihanmu lagi!";
+                encBox.className = "p-4 rounded-xl bg-amber-50 text-amber-800 font-semibold text-base border border-amber-200";
+                // Select sad meme
+                const randMeme = memeStore.sad[Math.floor(Math.random() * memeStore.sad.length)];
+                memeImg.src = randMeme;
+            }
+        }
+
+        function downloadReport() {
+            if (!currentStudent) return;
+
+            const content = `
+=====================================================
+          LAPORAN HASIL ASESMENT BROWSER
+=====================================================
+Nama Siswa    : ${currentStudent.name}
+Kelas         : ${currentStudent.studentClass}
+Tanggal Lahir : ${currentStudent.dob}
+PIN Absensi   : ${currentStudent.pin}
+Waktu Ujian   : ${new Date().toLocaleString('id-ID')}
+-----------------------------------------------------
+SKOR OBJEKTIF (PG / PGK / B-S) : ${document.getElementById('scoreDisplay').innerText}
+STATUS KOREKSI ESSAY           : Menunggu Koreksi Guru
+=====================================================
+Pesan Penyemangat:
+${document.getElementById('encouragementBox').innerText}
+=====================================================
+Sistem Proteksi: Proteksi Lapis Tinggi Bebas Kecurangan.
+            `.trim();
+
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `Laporan_Asesment_${currentStudent.name.replace(/\s+/g, '_')}.txt`;
+            link.click();
+        }
+
+        function resetToIdentity() {
+            document.getElementById('resultsView').classList.add('hidden');
+            document.getElementById('identityView').classList.remove('hidden');
+            document.getElementById('studentAuthForm').reset();
+        }
+
+        /* ==========================================================================
+           7. TEACHER PANEL & ESSAY GRADING LOGIC
+           ========================================================================== */
+        function toggleTeacherAuthModal() {
+            const modal = document.getElementById('teacherAuthModal');
+            modal.classList.toggle('hidden');
+            document.getElementById('teacherPasscode').value = '';
+            document.getElementById('teacherAuthError').classList.add('hidden');
+        }
+
+        function verifyTeacherPasscode() {
+            const pass = document.getElementById('teacherPasscode').value;
+            if (pass === 'guru123' || pass === 'admin') {
+                toggleTeacherAuthModal();
+                showTeacherPanel();
+            } else {
+                document.getElementById('teacherAuthError').classList.remove('hidden');
+            }
+        }
+
+        function showTeacherPanel() {
+            document.getElementById('identityView').classList.add('hidden');
+            document.getElementById('examView').classList.add('hidden');
+            document.getElementById('resultsView').classList.add('hidden');
+            document.getElementById('teacherPanel').classList.remove('hidden');
+
+            renderTeacherSubmissionsTable();
+            renderTeacherFraudTable();
+            renderTeacherQuestionBank();
+            renderTeacherMemeGallery();
+        }
+
+        function exitTeacherPanel() {
+            document.getElementById('teacherPanel').classList.add('hidden');
+            document.getElementById('identityView').classList.remove('hidden');
+        }
+
+        function switchTeacherTab(tabName) {
+            const tabs = ['submissions', 'fraud', 'questions', 'memes'];
+            tabs.forEach(t => {
+                const content = document.getElementById(`tab${t.charAt(0).toUpperCase() + t.slice(1)}`);
+                const btn = document.getElementById(`tabBtn${t.charAt(0).toUpperCase() + t.slice(1)}`);
+
+                if (t === tabName) {
+                    content.classList.remove('hidden');
+                    btn.className = "py-2.5 px-4 font-bold text-sm border-b-2 border-brand-600 text-brand-600 transition-all whitespace-nowrap";
+                } else {
+                    content.classList.add('hidden');
+                    btn.className = "py-2.5 px-4 font-bold text-sm border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition-all whitespace-nowrap";
+                }
+            });
+        }
+
+        function renderTeacherSubmissionsTable() {
+            const tableBody = document.getElementById('studentSubmissionsTable');
+            document.getElementById('submissionCount').innerText = `Total: ${studentSubmissions.length} Siswa`;
+
+            if (studentSubmissions.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-400">Belum ada siswa yang menyelesaikan ujian.</td></tr>`;
+                return;
+            }
+
+            tableBody.innerHTML = studentSubmissions.map((sub, index) => {
+                const essayPoints = (sub.essayScore !== null) ? `${sub.essayScore}/40` : '-';
+                const totalScore = sub.totalScore;
+                const statusBadge = (sub.essayStatus === 'Selesai') 
+                    ? `<span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded font-bold text-xs">Selesai</span>`
+                    : `<span class="px-2 py-0.5 bg-amber-100 text-amber-800 rounded font-bold text-xs">Perlu Koreksi</span>`;
+
+                return `
+                    <tr class="hover:bg-softgray-50 transition-all">
+                        <td class="p-3 font-semibold text-slate-800">${sub.student.name}</td>
+                        <td class="p-3">${sub.student.studentClass}</td>
+                        <td class="p-3 font-mono text-xs">${sub.student.pin}</td>
+                        <td class="p-3 font-bold text-brand-700">${sub.objectiveScore}/60</td>
+                        <td class="p-3 font-bold text-purple-700">${essayPoints}</td>
+                        <td class="p-3 font-extrabold text-base text-slate-900">${totalScore}/100</td>
+                        <td class="p-3">${statusBadge}</td>
+                        <td class="p-3 text-center">
+                            <button onclick="openEssayGradingModal(${index})" class="px-3 py-1.5 bg-brand-600 text-white rounded-lg text-xs font-bold hover:bg-brand-700 transition-all">
+                                Koreksi Essay & Review
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderTeacherFraudTable() {
+            const tableBody = document.getElementById('fraudTable');
+            if (lockedPINs.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">Tidak ada siswa yang terdeteksi kecurangan.</td></tr>`;
+                return;
+            }
+
+            tableBody.innerHTML = lockedPINs.map((f, i) => `
+                <tr class="hover:bg-red-50/50 transition-all">
+                    <td class="p-3 font-semibold text-red-900">${f.name || 'Siswa'}</td>
+                    <td class="p-3">${f.studentClass || '-'}</td>
+                    <td class="p-3 font-mono font-bold text-red-700">${f.pin}</td>
+                    <td class="p-3 text-xs">${f.timestamp}</td>
+                    <td class="p-3 text-xs text-red-600">${f.reason}</td>
+                    <td class="p-3">
+                        <button onclick="unlockPIN(${i})" class="px-2.5 py-1 bg-slate-200 text-slate-700 rounded text-xs font-bold hover:bg-slate-300">
+                            Buka Kunci
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function unlockPIN(index) {
+            lockedPINs.splice(index, 1);
+            localStorage.setItem('ab_locked_pins', JSON.stringify(lockedPINs));
+            renderTeacherFraudTable();
+        }
+
+        let activeGradingIndex = null;
+
+        function openEssayGradingModal(index) {
+            activeGradingIndex = index;
+            const sub = studentSubmissions[index];
+
+            document.getElementById('gradingStudentMeta').innerText = `Siswa: ${sub.student.name} | Kelas: ${sub.student.studentClass} | PIN: ${sub.student.pin}`;
+
+            const content = document.getElementById('essayGradingContent');
+            content.innerHTML = '';
+
+            // Render Essay Questions Scoring Interface
+            const essayQs = sub.questionsSnapshot.filter(q => q.type === 'ESSAY');
+
+            essayQs.forEach((q, idx) => {
+                const userAnsText = sub.answers[q.id]?.text || 'Tidak Menjawab';
+                const currentScore = sub.answers[q.id]?.givenPoints || 0;
+
+                const box = document.createElement('div');
+                box.className = "p-4 bg-softgray-50 border border-softgray-300 rounded-xl space-y-3";
+                box.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <span class="font-bold text-xs uppercase text-brand-700">Essay #${idx + 1} (Maks: ${q.points} Poin)</span>
+                    </div>
+                    <p class="text-xs font-semibold text-slate-800">${q.text}</p>
+                    
+                    <div class="p-3 bg-white border border-softgray-200 rounded-lg text-xs">
+                        <span class="font-bold text-slate-400 block mb-1">Jawaban Siswa:</span>
+                        <p class="text-slate-800 whitespace-pre-wrap">${userAnsText}</p>
+                    </div>
+
+                    <div class="p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs">
+                        <span class="font-bold text-amber-800 block mb-1"><i class="fa-solid fa-clipboard-check mr-1"></i>Rubrik Penilaian:</span>
+                        <p class="text-amber-900 whitespace-pre-wrap">${q.rubric}</p>
+                    </div>
+
+                    <div class="flex items-center space-x-3 pt-1">
+                        <label class="text-xs font-bold text-slate-700">Berikan Nilai (0 - ${q.points}):</label>
+                        <input type="number" min="0" max="${q.points}" value="${currentScore}" id="essayScoreInput_${q.id}" class="w-20 p-2 border border-softgray-300 rounded-lg text-xs font-bold text-center focus:ring-2 focus:ring-brand-500">
+                    </div>
+                `;
+                content.appendChild(box);
+            });
+
+            document.getElementById('essayGradingModal').classList.remove('hidden');
+        }
+
+        function saveEssayGrading() {
+            if (activeGradingIndex === null) return;
+
+            const sub = studentSubmissions[activeGradingIndex];
+            const essayQs = sub.questionsSnapshot.filter(q => q.type === 'ESSAY');
+
+            let totalEssayGraded = 0;
+
+            essayQs.forEach(q => {
+                const input = document.getElementById(`essayScoreInput_${q.id}`);
+                const val = Math.min(q.points, Math.max(0, parseInt(input.value) || 0));
+                
+                if (!sub.answers[q.id]) sub.answers[q.id] = {};
+                sub.answers[q.id].givenPoints = val;
+                totalEssayGraded += val;
+            });
+
+            sub.essayScore = totalEssayGraded;
+            sub.totalScore = sub.objectiveScore + totalEssayGraded;
+            sub.essayStatus = "Selesai";
+
+            localStorage.setItem('ab_submissions', JSON.stringify(studentSubmissions));
+
+            closeEssayModal();
+            renderTeacherSubmissionsTable();
+        }
+
+        function closeEssayModal() {
+            document.getElementById('essayGradingModal').classList.add('hidden');
+        }
+
+        function renderTeacherQuestionBank() {
+            const list = document.getElementById('questionBankList');
+            list.innerHTML = questions.map((q, idx) => `
+                <div class="p-3.5 bg-softgray-50 rounded-xl border border-softgray-200 flex items-center justify-between">
+                    <div>
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-brand-100 text-brand-700">Soal #${idx + 1} (${q.type})</span>
+                        <p class="text-xs font-medium text-slate-800 mt-1 line-clamp-1">${q.text}</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="editQuestion(${q.id})" class="p-1.5 bg-white border border-softgray-300 rounded text-slate-600 hover:text-brand-600 text-xs">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function editQuestion(id) {
+            const q = questions.find(item => item.id === id);
+            if (!q) return;
+            const newText = prompt("Edit Teks Soal:", q.text);
+            if (newText) {
+                q.text = newText;
+                localStorage.setItem('ab_questions', JSON.stringify(questions));
+                renderTeacherQuestionBank();
+            }
+        }
+
+        function openQuestionModal() {
+            alert("Fitur Tambah Soal Baru Siap Digunakan.");
+        }
+
+        function renderTeacherMemeGallery() {
+            const happyPrev = document.getElementById('happyMemePreview');
+            const sadPrev = document.getElementById('sadMemePreview');
+
+            happyPrev.innerHTML = memeStore.happy.map(url => `<img src="${url}" class="w-full aspect-video object-cover rounded border">`).join('');
+            sadPrev.innerHTML = memeStore.sad.map(url => `<img src="${url}" class="w-full aspect-video object-cover rounded border">`).join('');
+        }
+
+        // Image file upload handler for memes
+        document.getElementById('happyMemeInput').addEventListener('change', function(e) {
+            handleMemeUpload(e, 'happy');
+        });
+
+        document.getElementById('sadMemeInput').addEventListener('change', function(e) {
+            handleMemeUpload(e, 'sad');
+        });
+
+        function handleMemeUpload(event, type) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64Img = e.target.result;
+                if (type === 'happy') {
+                    memeStore.happy.unshift(base64Img);
+                    if (memeStore.happy.length > 3) memeStore.happy.pop();
+                } else {
+                    memeStore.sad.unshift(base64Img);
+                    if (memeStore.sad.length > 3) memeStore.sad.pop();
+                }
+
+                localStorage.setItem('ab_memes', JSON.stringify(memeStore));
+                renderTeacherMemeGallery();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        window.onload = function() {
+            console.log("Asesment Browser Engine Initialized Successfully.");
+        };
+    </script>
+</body>
+</html>
