@@ -1305,79 +1305,100 @@
            6. GRADING & FINAL RESULTS LOGIC
            ========================================================================== */
         function finishExamSession() {
-            isExamActive = false;
-            clearInterval(perQuestionTimer);
-            removeAntiCheatingListeners();
+           <script>
+    // =========================================================
+    // 1. PASANG URL DARI GOOGLE APPS SCRIPT DI SINI
+    // =========================================================
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx_r-fgL9hZF0c-sVYyIhG_Xp7Vo5ybkdt-H1b2HyXL9dpNAgZNHBuX9xQ6vE7K7wI/exec";
 
-            // Calculate Objective Score (PG, PGK, BS)
-            let totalObjectivePoints = 0;
-            let maxObjectivePoints = 0;
+    // Fungsi pengirim data ke Google Sheets
+    function kirimDataKeGoogleSheets(payload) {
+        if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("PASANG_URL")) {
+            console.warn("URL Google Apps Script belum dipasang!");
+            return;
+        }
 
-            currentExamQuestions.forEach(q => {
-                const userAns = studentAnswers[q.id];
+        fetch(GOOGLE_SCRIPT_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(() => {
+            console.log("Data ujian berhasil terkirim ke Google Sheets!");
+        })
+        .catch((error) => {
+            console.error("Gagal mengirim data ke Google Sheets:", error);
+        });
+    }
 
-                if (q.type === 'PG' || q.type === 'BS') {
-                    maxObjectivePoints += 10;
-                    if (userAns && userAns.selected === q.correctAnswer) {
+    // =========================================================
+    // 2. FUNGSI SELESAI UJIAN (finishExamSession)
+    // =========================================================
+    function finishExamSession() {
+        isExamActive = false;
+        clearInterval(perQuestionTimer);
+        removeAntiCheatingListeners();
+
+        // Calculate Objective Score (PG, PGK, BS)
+        let totalObjectivePoints = 0;
+        let maxObjectivePoints = 0;
+
+        currentExamQuestions.forEach(q => {
+            const userAns = studentAnswers[q.id];
+
+            if (q.type === 'PG' || q.type === 'BS') {
+                maxObjectivePoints += 10;
+                if (userAns && userAns.selected === q.correctAnswer) {
+                    totalObjectivePoints += 10;
+                }
+            } else if (q.type === 'PGK') {
+                maxObjectivePoints += 10;
+                if (userAns && Array.isArray(userAns.selected)) {
+                    // Compare sets
+                    const correctSet = new Set(q.correctAnswer);
+                    const userSet = new Set(userAns.selected);
+
+                    if (correctSet.size === userSet.size && [...correctSet].every(x => userSet.has(x))) {
                         totalObjectivePoints += 10;
                     }
-                } else if (q.type === 'PGK') {
-                    maxObjectivePoints += 10;
-                    if (userAns && Array.isArray(userAns.selected)) {
-                        // Compare sets
-                        const correctSet = new Set(q.correctAnswer);
-                        const userSet = new Set(userAns.selected);
-
-                        if (correctSet.size === userSet.size && [...correctSet].every(x => userSet.has(x))) {
-                            totalObjectivePoints += 10;
-                        }
-                    }
                 }
-            });
-
-            // Convert Objective Score to scale 0-100 (Objective portion = 60 points max scaled)
-            const scaledObjectiveScore = Math.round((totalObjectivePoints / maxObjectivePoints) * 60);
-
-            // Record Submission
-            const submissionRecord = {
-                student: currentStudent,
-                answers: studentAnswers,
-                questionsSnapshot: currentExamQuestions,
-                objectiveScore: scaledObjectiveScore,
-                essayScore: null, // Pending Guru
-                totalScore: scaledObjectiveScore,
-                essayStatus: "Belum Dinilai",
-                submittedAt: new Date().toLocaleString('id-ID')
-            };
-
-            studentSubmissions.push(submissionRecord);
-            localStorage.setItem('ab_submissions', JSON.stringify(studentSubmissions));
-
-            // Display Results
-            document.getElementById('examView').classList.add('hidden');
-            document.getElementById('resultsView').classList.remove('hidden');
-
-            document.getElementById('studentResultGreeting').innerText = `Siswa: ${currentStudent.name} (${currentStudent.studentClass})`;
-            document.getElementById('scoreDisplay').innerText = `${scaledObjectiveScore}/100`;
-
-            // Encouragement & Meme Selection
-            const encBox = document.getElementById('encouragementBox');
-            const memeImg = document.getElementById('resultMemeImg');
-
-            if (scaledObjectiveScore >= 70) {
-                encBox.innerText = "Bagus sekali! Kamu menunjukkan pemahaman yang sangat tinggi!";
-                encBox.className = "p-4 rounded-xl bg-emerald-50 text-emerald-800 font-semibold text-base border border-emerald-200";
-                // Select happy meme
-                const randMeme = memeStore.happy[Math.floor(Math.random() * memeStore.happy.length)];
-                memeImg.src = randMeme;
-            } else {
-                encBox.innerText = "Tetap semangat! Jangan berkecil hati, tingkatkan latihanmu lagi!";
-                encBox.className = "p-4 rounded-xl bg-amber-50 text-amber-800 font-semibold text-base border border-amber-200";
-                // Select sad meme
-                const randMeme = memeStore.sad[Math.floor(Math.random() * memeStore.sad.length)];
-                memeImg.src = randMeme;
             }
-        }
+        });
+
+        // -----------------------------------------------------
+        // ➕ KODE BARU: Mengumpulkan Jawaban Essay & Mengirim Data
+        // -----------------------------------------------------
+        let essayList = [];
+        currentExamQuestions.forEach(q => {
+            if (q.type === 'ESSAY') {
+                const ans = studentAnswers[q.id] ? studentAnswers[q.id].selected : "(Tidak dijawab)";
+                essayList.push(ans);
+            }
+        });
+
+        let finalObjectiveScore = maxObjectivePoints > 0 
+            ? Math.round((totalObjectivePoints / maxObjectivePoints) * 60) 
+            : 0;
+
+        let payload = {
+            nama: typeof currentStudent !== 'undefined' && currentStudent ? currentStudent.nama : "Tanpa Nama",
+            kelas: typeof currentStudent !== 'undefined' && currentStudent ? currentStudent.kelas : "-",
+            pin: typeof currentStudent !== 'undefined' && currentStudent ? currentStudent.pin : "-",
+            skorObjektif: finalObjectiveScore,
+            statusKecurangan: typeof cheatWarnings !== 'undefined' && cheatWarnings > 0 ? `Terdeteksi ${cheatWarnings}x` : "Bersih",
+            essayAnswers: essayList
+        };
+
+        // Memanggil fungsi pengirim data ke Google Sheets
+        kirimDataKeGoogleSheets(payload);
+
+        // Lanjut ke fungsi penampil hasil
+        showResultScreen(finalObjectiveScore);
+    }
+
 
         function downloadReport() {
             if (!currentStudent) return;
