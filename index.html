@@ -170,9 +170,12 @@
                             <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400"><i class="fa-solid fa-school"></i></span>
                             <select id="studentClass" required class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-softgray-300 focus:ring-2 focus:ring-brand-500 text-sm transition-all bg-white">
                                 <option value="">Pilih Kelas</option>
+                                <option value="VII 7">VII 7</option>
+                                <option value="VII 8">VII 8</option>
+                                <option value="VII 9">VII 9</option>
+                                <option value="VII 10">VII 10</option>
                                 <option value="VIII 1">VIII 1</option>
                                 <option value="VIII 2">VIII 2</option>
-                                <option value="VIII 3">VIII 3</option>
                                 <option value="VIII 4">VIII 4</option>
                             </select>
                         </div>
@@ -822,107 +825,185 @@
     const defaultBankSoalData = [
         {
             id: "bank-1",
-            title: "Bank Soal 1 - IPA Kelas 8 System Evaluasi",
+            title: "Bank Soal 1 - Informatika Kelas 8",
             timerType: "global",
-            globalDuration: 60,
+            globalDuration: 18,
             gradingScheme: "scale100",
-            reflectionUrl: "https://forms.google.com",
+            reflectionUrl: "https://ruangbelajar1905.blogspot.com/2026/10/refleksi-pembelajaran.html",
             questions: [
-                {
-                    id: 1,
-                    type: "PG",
-                    points: 10,
-                    timeLimit: 30,
-                    text: "Budi makan siang dengan menu ayam goreng tepung yang kaya protein dan lemak. Di lambung, normalnya terjadi pencernaan kimiawi oleh enzim pepsin dan asam klorida (HCl). Jika pada suatu kondisi lambung Budi mengalami penurunan produksi HCl secara drastis, analisis apa yang akan terjadi pada proses pencernaan protein di organ tersebut?",
-                    options: [
-                        "Pencernaan protein tetap berjalan normal karena dibantu sepenuhnya oleh enzim ptialin di dalam lambung.",
-                        "Protein tidak dapat dicerna secara optimal karena pepsinogen tidak teraktivasi menjadi pepsin tanpa suasana asam dari HCl.",
-                        "Lemak pada ayam goreng akan langsung dicerna di lambung tanpa bantuan empedu.",
-                        "Penyerapan glukosa di lambung akan meningkat drastis menggantikan fungsi usus halus"
-                    ],
-                    correctAnswer: "Protein tidak dapat dicerna secara optimal karena pepsinogen tidak teraktivasi menjadi pepsin tanpa suasana asam dari HCl.",
-                    explanation: "HCl diperlukan untuk mengaktifkan pepsinogen menjadi pepsin."
-                },
-                {
-                    id: 2,
-                    type: "PG",
-                    points: 10,
-                    timeLimit: 30,
-                    text: "Sekelompok siswa mengalami diare setelah mengonsumsi makanan dari kantin yang kurang higienis. Berdasarkan konsep fisiologi pencernaan, bagian organ manakah yang mengalami gangguan penyerapan paling parah sehingga menyebabkan feses berair?",
-                    options: [
-                        "Esofagus, karena terjadi hambatan gerak peristaltik makanan ke lambung.",
-                        "Lambung, akibat sekresi asam berlebih yang mencairkan isi makanan.",
-                        "Duodenum, karena produksi getah pankreas terhenti total oleh bakteri.",
-                        "Usus besar (kolon), karena infeksi bakteri mengganggu proses penyerapan kembali air dari sisa makanan."
-                    ],
-                    correctAnswer: "Usus besar (kolon), karena infeksi bakteri mengganggu proses penyerapan kembali air dari sisa makanan.",
-                    explanation: "Usus besar mengabsorpsi air dari sisa makanan."
-                },
-                {
-                    id: 3,
-                    type: "PGK",
-                    points: 15,
-                    timeLimit: 45,
-                    text: "Tubuh manusia membutuhkan karbohidrat, protein, lemak, vitamin dan mineral. Tentukan pernyataan yang tepat berdasarkan fungsi dan pencernaan zat makanan! (Pilih lebih dari satu)",
-                    options: [
-                        "Karbohidrat kompleks seperti amilum mulai dicerna secara kimiawi di mulut dengan bantuan enzim ptialin menjadi maltosa.",
-                        "Lemak merupakan sumber energi utama yang paling pertama dipecah oleh tubuh saat melakukan aktivitas fisik berat.",
-                        "Kekurangan protein dalam jangka panjang pada anak-anak dapat menyebabkan gangguan pertumbuhan (kwashiorkor).",
-                        "Vitamin dan mineral menghasilkan energi dalam jumlah besar setelah dipecah di lambung."
-                    ],
-                    correctAnswer: [
-                        "Karbohidrat kompleks seperti amilum mulai dicerna secara kimiawi di mulut dengan bantuan enzim ptialin menjadi maltosa.",
-                        "Kekurangan protein dalam jangka panjang pada anak-anak dapat menyebabkan gangguan pertumbuhan (kwashiorkor)."
-                    ],
-                    explanation: "Amilum dicerna ptialin dan kekurangan protein memicu kwashiorkor."
-                },
-                {
-                    id: 4,
-                    type: "BS",
-                    points: 10,
-                    timeLimit: 20,
-                    text: "Jika pankreas sudah tidak mampu melaksanakan fungsinya, tubuh kita akan dapat terkena penyakit jantung.",
-                    options: ["Benar", "Salah"],
-                    correctAnswer: "Salah",
-                    explanation: "Kerusakan pankreas berhubungan utama dengan penyakit diabetes melitus."
-                },
-                {
-                    id: 5,
-                    type: "ESSAY",
-                    points: 20,
-                    timeLimit: 90,
-                    text: "Jelaskan perbedaan antara pencernaan mekanis dan pencernaan kimiawi yang terjadi pada organ mulut manusia! Sebutkan pula organ atau zat yang terlibat dalam masing-masing proses tersebut.",
-                    rubric: "1. Penjelasan mekanis: 5 poin\n2. Penjelasan kimiawi: 5 poin\n3. Organ/zat terlibat: 5 poin\n4. Kejelasan tulisan: 5 poin"
-                }
-            ]
-        },
-        {
-            id: "bank-2",
-            title: "Soal Ulangan 2 - Sistem Peredaran Darah & Ekskresi",
-            timerType: "global",
-            globalDuration: 45,
-            gradingScheme: "scale100",
-            reflectionUrl: "https://forms.google.com",
-            questions: [
-                {
-                    id: 101,
-                    type: "PG",
-                    points: 10,
-                    timeLimit: 30,
-                    text: "Organ peredaran darah manusia yang memiliki dinding otot paling tebal dan kuat di antara ruang lainnya, sehingga mampu menghasilkan tekanan tinggi untuk memompa darah kaya oksigen (O₂) ke seluruh jaringan tubuh melalui pembuluh aorta adalah ...",
-                    options: ["Serambi kanan", "Bilik kanan", "Serambi kiri", "Bilik kiri"],
-                    correctAnswer: "Bilik kiri",
-                    explanation: "Bilik kiri memompa darah ke seluruh tubuh."
-                },
-                {
-                    id: 102,
-                    type: "ESSAY",
-                    points: 20,
-                    timeLimit: 90,
-                    text: "Sebutkan dan jelaskan fungsi dari 4 organ pencernaan utama pada manusia beserta peran pentingnya dalam metabolisme!",
-                    rubric: "1. Identifikasi 4 organ utama: 8 poin\n2. Penjelasan rinci fungsi: 12 poin"
-                }
-            ]
+  {
+    "id": 1,
+    "type": "PG",
+    "points": 5,
+    "timeLimit": 60,
+    "text": "Seorang pengguna berinteraksi dengan komputer menggunakan ikon, tombol grafis, dan menu visual dengan bantuan mouse. Jenis antarmuka pengguna (User Interface) yang digunakan oleh pengguna tersebut adalah...",
+    "options": [
+      "GUI (Graphical User Interface)",
+      "CLI (Command Line Interface)",
+      "VUI (Voice User Interface)",
+      "CUI (Character User Interface)"
+    ],
+    "correctAnswer": "GUI (Graphical User Interface)"
+  },
+  {
+    "id": 2,
+    "type": "PG",
+    "points": 5,
+    "timeLimit": 60,
+    "text": "Pak Andi ingin mengelompokkan dokumen tugas para siswanya di laptop agar rapi dan tidak bercampur dengan dokumen pribadi. Fitur pada sistem operasi yang paling tepat digunakan oleh Pak Andi adalah...",
+    "options": [
+      "Membuat Folder baru",
+      "Mengubah Ekstensi File",
+      "Membuat File baru",
+      "Mengompresi File"
+    ],
+    "correctAnswer": "Membuat Folder baru"
+  },
+  {
+    "id": 3,
+    "type": "PG",
+    "points": 5,
+    "timeLimit": 60,
+    "text": "Ketika Anda hendak mengirimkan surel (email) berisi surat mengajukan diri untuk mengikuti osis, posisi yang tepat untuk melampirkan berkas CV dalam bentuk PDF adalah pada fitur...",
+    "options": [
+      "Attachment (Lampiran)",
+      "Subject (Subjek)",
+      "Cc (Carbon Copy)",
+      "Bcc (Blind Carbon Copy)"
+    ],
+    "correctAnswer": "Attachment (Lampiran)"
+  },
+  {
+    "id": 4,
+    "type": "PG",
+    "points": 5,
+    "timeLimit": 60,
+    "text": "Perhatikan aplikasi-aplikasi berikut:\n1. Google Chrome\n2. Google Search\n3. Mozilla Firefox\n4. DuckDuckGo\n\nManakah yang termasuk ke dalam kategori peramban web (web browser)?",
+    "options": [
+      "1 dan 3",
+      "1 dan 2",
+      "2 dan 4",
+      "3 dan 4"
+    ],
+    "correctAnswer": "1 dan 3"
+  },
+  {
+    "id": 5,
+    "type": "PG",
+    "points": 5,
+    "timeLimit": 60,
+    "text": "Rina ingin menyusun laporan keuangan Kas Kelas yang membutuhkan perhitungan rumus, tabel, dan grafik otomatis. Aplikasi perkantoran yang paling efisien untuk digunakan Rina adalah...",
+    "options": [
+      "Aplikasi Pengolah Angka (Spreadsheet)",
+      "Aplikasi Pengolah Kata (Word Processor)",
+      "Aplikasi Presentasi (Presentation)",
+      "Aplikasi Desain Grafis"
+    ],
+    "correctAnswer": "Aplikasi Pengolah Angka (Spreadsheet)"
+  },
+  {
+    "id": 6,
+    "type": "PG",
+    "points": 5,
+    "timeLimit": 60,
+    "text": "Ketika mencari informasi spesifik berupa file PDF tentang materi Informatika di mesin pencari (search engine), kata kunci tambahan yang paling efektif untuk ditambahkan adalah...",
+    "options": [
+      "filetype:pdf",
+      "ext=pdf",
+      "format:pdf",
+      "type#pdf"
+    ],
+    "correctAnswer": "filetype:pdf"
+  },
+  {
+    "id": 7,
+    "type": "PG",
+    "points": 5,
+    "timeLimit": 60,
+    "text": "Budi menerima surel dari pihak yang mengaku bank meminta password akunnya. Namun, alamat surel pengirim menggunakan domain gratisan dan meminta klik tautan mencurigakan. Jenis serangan cyber melalui surel ini disebut...",
+    "options": [
+      "Phishing",
+      "Spamming",
+      "Blogging",
+      "Browsing"
+    ],
+    "correctAnswer": "Phishing"
+  },
+  {
+    "id": 8,
+    "type": "PG",
+    "points": 5,
+    "timeLimit": 60,
+    "text": "Sebuah file bernama `Laporan_TIK.docx` disimpan di dalam komputer. Berdasarkan ekstensi file `.docx`, file tersebut dibuat menggunakan aplikasi...",
+    "options": [
+      "Pengolah Kata (Microsoft Word)",
+      "Pengolah Angka (Microsoft Excel)",
+      "Presentasi (Microsoft PowerPoint)",
+      "Pengolah Gambar (Adobe Photoshop)"
+    ],
+    "correctAnswer": "Pengolah Kata (Microsoft Word)"
+  },
+  {
+    "id": 9,
+    "type": "PGK",
+    "points": 10,
+    "timeLimit": 90,
+    "text": "Pilihlah DUA tindakan yang paling tepat untuk merapikan dan mengamankan file tugas sekolah yang bertumpuk di desktop komputer Anda! (Pilih 2 jawaban)",
+    "options": [
+      "Membuat folder khusus untuk setiap mata pelajaran dan memindahkan file ke dalamnya",
+      "Mengompresi (ZIP/RAR) folder tugas lama yang jarang dibuka untuk menghemat ruang simpan",
+      "Menghapus semua file yang ada di desktop tanpa memeriksa isi kandungannya",
+      "Mengubah semua ekstensi file menjadi .txt agar mudah dibuka"
+    ],
+    "correctAnswer": [
+      "Membuat folder khusus untuk setiap mata pelajaran dan memindahkan file ke dalamnya",
+      "Mengompresi (ZIP/RAR) folder tugas lama yang jarang dibuka untuk menghemat ruang simpan"
+    ]
+  },
+  {
+    "id": 10,
+    "type": "PGK",
+    "points": 10,
+    "timeLimit": 90,
+    "text": "Pilihlah DUA pernyataan yang BENAR mengenai perbedaan antara Peramban Web (Web Browser) dan Mesin Pencari (Search Engine)! (Pilih 2 jawaban)",
+    "options": [
+      "Peramban web adalah perangkat lunak untuk mengakses situs web, sedangkan mesin pencari adalah program berbasis web untuk mencari informasi",
+      "Google Chrome adalah contoh peramban web, sedangkan Google Search adalah contoh mesin pencari",
+      "Mesin pencari harus diinstal terlebih dahulu di laptop, sedangkan peramban web tidak perlu diinstal",
+      "Peramban web berfungsi mencari kata kunci, sedangkan mesin pencari menampilkan gambar saja"
+    ],
+    "correctAnswer": [
+      "Peramban web adalah perangkat lunak untuk mengakses situs web, sedangkan mesin pencari adalah program berbasis web untuk mencari informasi",
+      "Google Chrome adalah contoh peramban web, sedangkan Google Search adalah contoh mesin pencari"
+    ]
+  },
+  {
+    "id": 11,
+    "type": "BS",
+    "points": 10,
+    "timeLimit": 60,
+    "text": "Penggunaan fitur Bcc (Blind Carbon Copy) pada surel membuat penerima utama tidak dapat melihat daftar alamat email lain yang dimasukkan ke dalam kolom Bcc tersebut.",
+    "options": ["Benar", "Salah"],
+    "correctAnswer": "Benar"
+  },
+  {
+    "id": 12,
+    "type": "BS",
+    "points": 10,
+    "timeLimit": 60,
+    "text": "Antarmuka berbasis CLI (Command Line Interface) lebih disukai oleh pengguna awam karena tampilannya kaya akan visual warna, tombol ikon, dan sangat intuitif.",
+    "options": ["Benar", "Salah"],
+    "correctAnswer": "Salah"
+  },
+  {
+    "id": 13,
+    "type": "ESSAY",
+    "points": 20,
+    "timeLimit": 120,
+    "text": "Anda diminta untuk membuat dokumen laporan kegiatan OSIS yang memuat teks penjelasan, data anggaran biaya dalam bentuk tabel beserta perhitungannya, serta slide presentasi untuk disampaikan kepada Pembina OSIS. Jelaskan secara berurutan aplikasi perkantoran apa saja yang Anda gunakan beserta peran spesifik dari masing-masing aplikasi tersebut!",
+    "rubric": "Siswa menyebutkan 3 jenis aplikasi perkantoran secara tepat: (1) Aplikasi Pengolah Kata untuk menyusun dokumen teks laporan, (2) Aplikasi Pengolah Angka/Spreadsheet untuk mengolah data anggaran biaya dan tabel perhitungan, serta (3) Aplikasi Presentasi untuk membuat slide paparan kegiatan."
+  }
+]
         }
     ];
 
@@ -932,19 +1013,18 @@
     let usedPINs = JSON.parse(localStorage.getItem('ab_used_pins')) || [];
     let studentSubmissions = JSON.parse(localStorage.getItem('ab_submissions')) || [];
     
-    // UPDATED MEME LINKS WITH REAL, FUNNY & APPROPRIATE MEMES FROM THE INTERNET
     let memeStore = JSON.parse(localStorage.getItem('ab_memes')) || {
         happy: [
-            'https://i.imgflip.com/1ur9b0.jpg', // Success Kid
-            'https://i.imgflip.com/30b1gx.jpg', // Drake approving
-            'https://i.imgflip.com/26am.jpg',   // Yao Ming / Happy face
-            'https://i.imgflip.com/28j0te.jpg'  // Obama gives medal to Obama
+            'https://i.imgflip.com/1ur9b0.jpg',
+            'https://i.imgflip.com/30b1gx.jpg',
+            'https://i.imgflip.com/26am.jpg',
+            'https://i.imgflip.com/28j0te.jpg'
         ],
         sad: [
-            'https://i.imgflip.com/1g8my4.jpg', // Roll safe / Thinking guy
-            'https://i.imgflip.com/2fm6x.jpg',  // Disappointed Cricket Fan
-            'https://i.imgflip.com/1h7in3.jpg', // Crying cat
-            'https://i.imgflip.com/1otk96.jpg'  // Distracted boyfriend / studying
+            'https://i.imgflip.com/1g8my4.jpg',
+            'https://i.imgflip.com/2fm6x.jpg',
+            'https://i.imgflip.com/1h7in3.jpg',
+            'https://i.imgflip.com/1otk96.jpg'
         ]
     };
 
@@ -1651,7 +1731,6 @@
             document.getElementById('scoreDisplay').innerText = `${score} Poin`;
         }
 
-        // SET STUDENT REFLECTION BUTTON URL FROM TEACHER'S INPUT
         const refBtn = document.getElementById('studentReflectionBtn');
         const refUrl = activeBank.reflectionUrl || "https://forms.google.com";
         refBtn.href = refUrl;
@@ -2083,47 +2162,18 @@ Sistem Proteksi: Anti-Cheating Assessment Browser.
         optionsGroup.classList.remove('hidden');
         essayGroup.classList.add('hidden');
 
-        if (type === 'PG') {
+        if (type === 'PG' || type === 'PGK') {
             const opts = existingData ? existingData.options : ['Opsi A', 'Opsi B', 'Opsi C', 'Opsi D'];
-            const correct = existingData ? existingData.correctAnswer : opts[0];
-
-            opts.forEach((optVal, idx) => {
+            opts.forEach((optText, idx) => {
                 const div = document.createElement('div');
-                div.className = "flex items-center space-x-2";
+                div.className = "flex items-center gap-2";
                 div.innerHTML = `
-                    <input type="radio" name="modalCorrectRadio" value="${idx}" ${optVal === correct ? 'checked' : ''} class="text-brand-600 focus:ring-brand-500">
-                    <input type="text" class="pg-opt-input w-full p-2 rounded-xl border border-softgray-300 text-xs" value="${optVal}" placeholder="Teks Opsi ${idx + 1}">
-                `;
-                container.appendChild(div);
-            });
-        } else if (type === 'PGK') {
-            const opts = existingData ? existingData.options : ['Opsi 1', 'Opsi 2', 'Opsi 3', 'Opsi 4'];
-            const correctArr = existingData && Array.isArray(existingData.correctAnswer) ? existingData.correctAnswer : [opts[0]];
-
-            opts.forEach((optVal, idx) => {
-                const isChecked = correctArr.includes(optVal);
-                const div = document.createElement('div');
-                div.className = "flex items-center space-x-2";
-                div.innerHTML = `
-                    <input type="checkbox" name="modalCorrectCheck" value="${idx}" ${isChecked ? 'checked' : ''} class="rounded text-purple-600 focus:ring-purple-500">
-                    <input type="text" class="pg-opt-input w-full p-2 rounded-xl border border-softgray-300 text-xs" value="${optVal}" placeholder="Teks Opsi ${idx + 1}">
+                    <input type="text" class="modal-opt-input flex-1 p-2 rounded-lg border text-xs" value="${optText}" placeholder="Opsi ${idx+1}">
                 `;
                 container.appendChild(div);
             });
         } else if (type === 'BS') {
-            const correct = existingData ? existingData.correctAnswer : "Benar";
-            container.innerHTML = `
-                <div class="flex items-center space-x-4 text-xs font-semibold">
-                    <label class="flex items-center space-x-1 cursor-pointer">
-                        <input type="radio" name="modalCorrectRadio" value="Benar" ${correct === 'Benar' ? 'checked' : ''}>
-                        <span>Kunci: Benar</span>
-                    </label>
-                    <label class="flex items-center space-x-1 cursor-pointer">
-                        <input type="radio" name="modalCorrectRadio" value="Salah" ${correct === 'Salah' ? 'checked' : ''}>
-                        <span>Kunci: Salah</span>
-                    </label>
-                </div>
-            `;
+            container.innerHTML = `<p class="text-xs text-slate-500 italic">Opsi otomatis terpasang: 'Benar' & 'Salah'</p>`;
         }
     }
 
@@ -2142,46 +2192,25 @@ Sistem Proteksi: Anti-Cheating Assessment Browser.
 
         let newQuestion = {
             id: editingId ? parseInt(editingId) : Date.now(),
-            type,
-            points,
-            timeLimit,
-            text
+            type: type,
+            points: points,
+            timeLimit: timeLimit,
+            text: text
         };
 
         if (type === 'ESSAY') {
             newQuestion.rubric = document.getElementById('modalQRubric').value.trim();
-        } else if (type === 'PG') {
-            const inputs = document.querySelectorAll('.pg-opt-input');
-            const opts = Array.from(inputs).map(i => i.value.trim());
-            const selectedRadio = document.querySelector('input[name="modalCorrectRadio"]:checked');
-
-            if (!selectedRadio) {
-                alert("Pilih satu kunci jawaban yang benar!");
-                return;
-            }
-
-            newQuestion.options = opts;
-            newQuestion.correctAnswer = opts[parseInt(selectedRadio.value)];
-        } else if (type === 'PGK') {
-            const inputs = document.querySelectorAll('.pg-opt-input');
-            const opts = Array.from(inputs).map(i => i.value.trim());
-            const checkedBoxes = document.querySelectorAll('input[name="modalCorrectCheck"]:checked');
-
-            if (checkedBoxes.length === 0) {
-                alert("Pilih minimal satu kunci jawaban yang benar!");
-                return;
-            }
-
-            newQuestion.options = opts;
-            newQuestion.correctAnswer = Array.from(checkedBoxes).map(cb => opts[parseInt(cb.value)]);
         } else if (type === 'BS') {
-            const selectedRadio = document.querySelector('input[name="modalCorrectRadio"]:checked');
             newQuestion.options = ["Benar", "Salah"];
-            newQuestion.correctAnswer = selectedRadio ? selectedRadio.value : "Benar";
+            newQuestion.correctAnswer = "Benar";
+        } else {
+            const inputs = document.querySelectorAll('.modal-opt-input');
+            newQuestion.options = Array.from(inputs).map(inp => inp.value.trim());
+            newQuestion.correctAnswer = newQuestion.options[0] || "";
         }
 
         if (editingId) {
-            const idx = activeBank.questions.findIndex(q => q.id === parseInt(editingId));
+            const idx = activeBank.questions.findIndex(q => q.id == editingId);
             if (idx !== -1) activeBank.questions[idx] = newQuestion;
         } else {
             activeBank.questions.push(newQuestion);
@@ -2192,10 +2221,10 @@ Sistem Proteksi: Anti-Cheating Assessment Browser.
         renderTeacherQuestionBank();
     }
 
-    function deleteQuestion(qId) {
+    function deleteQuestion(id) {
         if (!confirm("Apakah Anda yakin ingin menghapus soal ini?")) return;
         const activeBank = getActiveBank();
-        activeBank.questions = activeBank.questions.filter(q => q.id !== qId);
+        activeBank.questions = activeBank.questions.filter(q => q.id !== id);
         localStorage.setItem('ab_bank_soal_list', JSON.stringify(bankSoalList));
         renderTeacherQuestionBank();
     }
@@ -2210,43 +2239,37 @@ Sistem Proteksi: Anti-Cheating Assessment Browser.
     }
 
     function processImportJson() {
-        const jsonText = document.getElementById('importJsonInput').value.trim();
+        const raw = document.getElementById('importJsonInput').value.trim();
         try {
-            const parsed = JSON.parse(jsonText);
-            if (!Array.isArray(parsed)) throw new Error("Data JSON harus berupa Array object soal.");
-
+            const parsed = JSON.parse(raw);
+            if (!Array.isArray(parsed)) throw new Error("Format harus berupa Array JSON []");
             const activeBank = getActiveBank();
-            parsed.forEach(item => {
-                item.id = Date.now() + Math.floor(Math.random() * 1000);
-                activeBank.questions.push(item);
-            });
-
+            activeBank.questions = activeBank.questions.concat(parsed);
             localStorage.setItem('ab_bank_soal_list', JSON.stringify(bankSoalList));
             closeImportJsonModal();
             renderTeacherQuestionBank();
-            alert("Berhasil meng-import " + parsed.length + " soal!");
+            alert("Berhasil mengimpor soal!");
         } catch (err) {
-            alert("Format JSON tidak valid: " + err.message);
+            alert("JSON tidak valid: " + err.message);
         }
     }
 
     function renderTeacherMemeGallery() {
-        const happyBox = document.getElementById('happyMemePreview');
-        const sadBox = document.getElementById('sadMemePreview');
+        const happyContainer = document.getElementById('happyMemePreview');
+        const sadContainer = document.getElementById('sadMemePreview');
 
-        happyBox.innerHTML = memeStore.happy.map(url => `
-            <div class="aspect-video bg-slate-900 rounded-lg overflow-hidden border border-emerald-300 relative">
-                <img src="${url}" class="w-full h-full object-contain" alt="Meme Lulus">
+        happyContainer.innerHTML = memeStore.happy.map(url => `
+            <div class="aspect-video bg-slate-200 rounded-lg overflow-hidden border border-emerald-300">
+                <img src="${url}" class="w-full h-full object-cover">
             </div>
         `).join('');
 
-        sadBox.innerHTML = memeStore.sad.map(url => `
-            <div class="aspect-video bg-slate-900 rounded-lg overflow-hidden border border-rose-300 relative">
-                <img src="${url}" class="w-full h-full object-contain" alt="Meme Remedial">
+        sadContainer.innerHTML = memeStore.sad.map(url => `
+            <div class="aspect-video bg-slate-200 rounded-lg overflow-hidden border border-rose-300">
+                <img src="${url}" class="w-full h-full object-cover">
             </div>
         `).join('');
     }
 </script>
-
 </body>
 </html>
